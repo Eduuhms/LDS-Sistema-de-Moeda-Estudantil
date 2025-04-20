@@ -1,3 +1,5 @@
+```code
+
 @startuml
 
 abstract class Usuario {
@@ -104,3 +106,5 @@ Resgate "n" -- "1" Aluno
 Resgate "n" -- "1" Vantagem
 
 @enduml
+
+```
