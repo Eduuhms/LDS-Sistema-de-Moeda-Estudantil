@@ -7,11 +7,8 @@ component "FrontEnd" as FrontEnd
 
 component "Backend" as Backend {
   component "Autenticação"
-  component "Gerenciamento de Aluno"
-  component "Gerenciamento de Professor"
-  component "Gerenciamento de EmpresaParceira"
+  component "Gerenciamento de Usuário"
   component "Gerenciamento de Vantagem"
-  component "Gerenciamento de Instituições de Ensino"
   component "Gerenciamento de Transações"
   component "Gerenciamento de Resgates"
 }

@@ -19,3 +19,7 @@
 ## Usuário Geral
 - Como usuário, quero me cadastrar no sistema para acessar as funcionalidades disponíveis para meu perfil.
 - Como usuário, quero fazer login de forma simples para acessar o sistema de maneira segura. 
+
+## Usuário Institucional
+- Como usuário institucional, quero enviar moedas para professores para distribuir recursos que serão utilizados na premiação dos alunos.
+- Como usuário institucional, quero que os professores sejam notificados por email ao receberem moedas para garantir que saibam que receberam novos recursos.

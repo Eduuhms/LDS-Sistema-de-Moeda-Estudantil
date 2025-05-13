@@ -1,31 +1,31 @@
 ```code
 
 @startuml
-
 abstract class Usuario {
+  - id: Int
   - nome: String
   - email: String
   - senha: String
   + autenticar(email: String, senha: String): boolean
 }
 
-class Aluno extends Usuario implements GerenciadorMoedas  {
+class Aluno extends Usuario implements GerenciadorMoedas {
   - cpf: String
   - rg: String
   - endereco: String
   - curso: String
-  - saldoMoedas: Integer
+  - saldoMoedas: Int
   - instituicaoEnsino: InstituicaoEnsino
   + resgatarVantagem(vantagem: Vantagem): Resgate
-  + receberMoedas(quantidade: Integer, mensagem: String, professor: Professor): void
+  + receberMoedas(quantidade: Int, mensagem: String, professor: Professor): void
 }
 
-class Professor extends Usuario implements GerenciadorMoedas  {
+class Professor extends Usuario implements GerenciadorMoedas {
   - cpf: String
   - departamento: String
   - instituicaoEnsino: InstituicaoEnsino
-  - saldoMoedas: Integer
-  + enviarMoedas(aluno: Aluno, quantidade: Integer, mensagem: String): boolean
+  - saldoMoedas: Int
+  + enviarMoedas(aluno: Aluno, quantidade: Int, mensagem: String): boolean
   + recarregarMoedasSemestrais(): void
 }
 
@@ -40,6 +40,7 @@ class EmpresaParceira extends Usuario {
 }
 
 class InstituicaoEnsino {
+  - id: Int
   - nome: String
   - endereco: String
   - cnpj: String
@@ -48,16 +49,18 @@ class InstituicaoEnsino {
 }
 
 class Vantagem {
+  - id: Int
   - nome: String
   - descricao: String
   - foto: String
-  - custoMoedas: Integer
+  - custoMoedas: Int
   - empresaParceira: EmpresaParceira
 }
 
 class Transacao {
+  - id: Int
   - dataHora: LocalDateTime
-  - quantidade: Integer
+  - quantidade: Int
   - mensagem: String
   - origem: Usuario
   - destino: Usuario
@@ -71,6 +74,7 @@ enum TipoTransacao {
 }
 
 class Resgate {
+  - id: Int
   - dataHora: LocalDateTime
   - aluno: Aluno
   - vantagem: Vantagem
@@ -88,14 +92,14 @@ enum StatusResgate {
 }
 
 class EmailService {
-  + enviarNotificacaoMoedas(aluno: Aluno, quantidade: Integer, mensagem: String, professor: Professor): void
+  + enviarNotificacaoMoedas(aluno: Aluno, quantidade: Int, mensagem: String, professor: Professor): void
   + enviarNotificacaoResgate(resgate: Resgate): void
 }
 
 interface GerenciadorMoedas {
-  + getSaldoMoedas(): Integer
+  + getSaldoMoedas(): Int
   + consultarExtrato(): List<Transacao>
-  + possuiSaldoSuficiente(quantidade: Integer): boolean
+  + possuiSaldoSuficiente(quantidade: Int): boolean
 }
 
 Aluno "n" -- "1" InstituicaoEnsino
@@ -104,7 +108,6 @@ Vantagem "n" -- "1" EmpresaParceira
 Transacao "n" -- "2" Usuario
 Resgate "n" -- "1" Aluno
 Resgate "n" -- "1" Vantagem
-
 @enduml
 
 ```

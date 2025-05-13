@@ -15,11 +15,10 @@ node "Database" as db_storage{
 }
 
 browser ..> frontend
-user_computer --> app_server : HTTPS
+user_computer -- app_server : HTTPS
 frontend ..> back
 back ..> bd
-app_server --> db_storage
+app_server -- db_storage
 @enduml
-
 
 ```
