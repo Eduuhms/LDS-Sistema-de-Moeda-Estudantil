@@ -1,88 +1,160 @@
 const UsuarioModel = require('../models/UsuarioModel');
 const AlunoModel = require('../models/AlunoModel');
+const InstituicaoEnsinoModel = require('../models/InstituicaoEnsinoModel');
 const db = require('../config/database');
 
 class AlunoController {
-  // Renderiza o formulário de cadastro
   static async exibirFormulario(req, res) {
     res.render('alunos/cadastro');
   }
 
-  // Lista todos os alunos
   static async listar(req, res) {
     try {
       const alunos = await AlunoModel.listar();
       return res.status(200).json(alunos);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(500).json({ erro: 'Falha ao listar alunos. Por favor, tente novamente mais tarde.' });
     }
   }
 
-  // Criar novo aluno
+  static validarCPF(cpf) {
+    cpf = cpf.replace(/[^\d]/g, '');
+    return cpf.length == 11;
+  }
+
+  static validarRG(rg) {
+    rg = rg.replace(/[^\w]/g, '');
+    if (rg.length < 5 || rg.length > 14) {
+      return false;
+    }
+    
+    return true;
+  }
+
   static async cadastrar(req, res) {
-    // Usamos transação manual para garantir consistência
-    const connection = await db.getConnection();
+    const { nome, email, senha, cpf, rg, endereco, curso, instituicaoEnsinoId } = req.body;
     
     try {
-      await connection.beginTransaction();
-      
-      const { nome, email, senha, cpf, rg, endereco, curso, instituicaoEnsinoId } = req.body;
-      
-      // Verificar se e-mail já existe
-      const usuarioExistente = await UsuarioModel.buscarPorEmail(email);
-      if (usuarioExistente) {
-        return res.status(400).json({ erro: 'E-mail já cadastrado' });
+      if (!nome || !email || !senha || !cpf || !rg || !endereco || !curso || !instituicaoEnsinoId) {
+        return res.status(400).json({ 
+          erro: 'Todos os campos são obrigatórios',
+          campos_faltantes: [
+            !nome && 'nome',
+            !email && 'email', 
+            !senha && 'senha',
+            !cpf && 'cpf',
+            !rg && 'rg',
+            !endereco && 'endereco',
+            !curso && 'curso',
+            !instituicaoEnsinoId && 'instituição de ensino'
+          ].filter(Boolean)
+        });
       }
       
-      // Criar o usuário primeiro
-      const usuarioId = await UsuarioModel.criar({
-        nome,
-        email,
-        senha,
-        tipo: 'aluno'
-      });
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ erro: 'Formato de e-mail inválido' });
+      }
       
-      // Criar o aluno associado ao usuário
-      const alunoId = await AlunoModel.criar({
-        usuarioId: usuarioId,
-        cpf,
-        rg,
-        endereco,
-        curso,
-        instituicaoEnsinoId
-      });
+      const usuarioExistente = await UsuarioModel.buscarPorEmail(email);
+      if (usuarioExistente) {
+        return res.status(400).json({ erro: 'E-mail já cadastrado. Por favor, utilize outro e-mail ou recupere sua senha.' });
+      }
       
-      await connection.commit();
+      if (!AlunoController.validarCPF(cpf)) {
+        return res.status(400).json({ erro: 'CPF inválido. Por favor, informe um CPF válido.' });
+      }
       
-      // Buscar o aluno completo para retornar
-      const aluno = await AlunoModel.buscarPorId(alunoId);
+      if (!AlunoController.validarRG(rg)) {
+        return res.status(400).json({ erro: 'RG inválido. O RG deve ter entre 5 e 14 caracteres.' });
+      }
       
-      return res.status(201).json({
-        mensagem: 'Aluno cadastrado com sucesso',
-        aluno
-      });
+      const cpfLimpo = cpf.replace(/[^\d]/g, '');
+      const alunoComCPF = await AlunoModel.buscarPorCPF(cpfLimpo);
+      if (alunoComCPF) {
+        return res.status(400).json({ erro: 'CPF já cadastrado. Cada aluno deve ter um CPF único.' });
+      }
+      
+      const rgLimpo = rg.replace(/[^\w]/g, '');
+      const alunoComRG = await AlunoModel.buscarPorRG(rgLimpo);
+      if (alunoComRG) {
+        return res.status(400).json({ erro: 'RG já cadastrado. Cada aluno deve ter um RG único.' });
+      }
+      
+      const instituicao = await InstituicaoEnsinoModel.buscarPorId(instituicaoEnsinoId);
+      if (!instituicao) {
+        return res.status(404).json({ 
+          erro: 'Instituição de ensino não encontrada. Por favor, selecione uma instituição válida.' 
+        });
+      }
+      
+      const connection = await db.getConnection();
+      await connection.beginTransaction();
+      
+      try {
+        const usuarioId = await UsuarioModel.criar({
+          nome,
+          email,
+          senha,
+          tipo: 'aluno'
+        });
+        
+        const alunoId = await AlunoModel.criar({
+          usuarioId: usuarioId,
+          cpf: cpfLimpo,
+          rg: rgLimpo,
+          endereco,
+          curso,
+          instituicaoEnsinoId
+        });
+        
+        await connection.commit();
+        
+        const aluno = await AlunoModel.buscarPorId(alunoId);
+        
+        return res.status(201).json({
+          mensagem: 'Aluno cadastrado com sucesso',
+          aluno
+        });
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
     } catch (error) {
-      await connection.rollback();
-      return res.status(400).json({ erro: error.message });
-    } finally {
-      connection.release();
+      if (error.code === 'ER_DUP_ENTRY') {
+        if (error.message.includes('cpf')) {
+          return res.status(400).json({ erro: 'CPF já cadastrado. Cada aluno deve ter um CPF único.' });
+        }
+        if (error.message.includes('rg')) {
+          return res.status(400).json({ erro: 'RG já cadastrado. Cada aluno deve ter um RG único.' });
+        }
+        return res.status(400).json({ erro: 'Informação duplicada. Verifique seus dados e tente novamente.' });
+      }
+      
+      console.error('Erro no cadastro de aluno:', error);
+      return res.status(500).json({ erro: 'Erro ao cadastrar aluno. Por favor, tente novamente mais tarde.' });
     }
   }
 
-  // Buscar um aluno por ID
   static async buscarPorId(req, res) {
     try {
       const { id } = req.params;
       
+      if (!id || isNaN(parseInt(id))) {
+        return res.status(400).json({ erro: 'ID de aluno inválido' });
+      }
+      
       const aluno = await AlunoModel.buscarPorId(id);
       
       if (!aluno) {
-        return res.status(404).json({ erro: 'Aluno não encontrado' });
+        return res.status(404).json({ erro: 'Aluno não encontrado. Verifique o ID informado.' });
       }
       
       return res.status(200).json(aluno);
     } catch (error) {
-      return res.status(500).json({ erro: error.message });
+      return res.status(500).json({ erro: 'Falha ao buscar aluno. Por favor, tente novamente mais tarde.' });
     }
   }
 }

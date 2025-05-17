@@ -14,6 +14,19 @@ const pool = mysql.createPool({
 
   const initDb = async () => {
     try {
+      // Tabela de instituições de ensino
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS instituicoes_ensino (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nome VARCHAR(200) NOT NULL,
+          endereco VARCHAR(255) NOT NULL,
+          cnpj VARCHAR(20) NOT NULL UNIQUE,
+          telefone VARCHAR(20),
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+        )
+      `);
+
       // Tabela de usuários
       await pool.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -40,7 +53,8 @@ const pool = mysql.createPool({
           instituicao_ensino_id INT NOT NULL,
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-          FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+          FOREIGN KEY (instituicao_ensino_id) REFERENCES instituicoes_ensino(id)
         )
       `);
       

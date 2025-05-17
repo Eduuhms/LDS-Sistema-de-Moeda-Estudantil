@@ -32,6 +32,24 @@ class AlunoModel {
     return alunos[0];
   }
   
+  static async buscarPorCPF(cpf) {
+    const [alunos] = await db.query(
+      'SELECT * FROM alunos WHERE cpf = ?',
+      [cpf]
+    );
+    
+    return alunos[0];
+  }
+  
+  static async buscarPorRG(rg) {
+    const [alunos] = await db.query(
+      'SELECT * FROM alunos WHERE rg = ?',
+      [rg]
+    );
+    
+    return alunos[0];
+  }
+  
   static async listar() {
     const [alunos] = await db.query(`
       SELECT a.*, u.nome, u.email 

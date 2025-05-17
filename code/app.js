@@ -14,8 +14,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
 
 // Rotas
-const alunoRoutes = require('./src/routes/Aluno');
+const alunoRoutes = require('./src/routes/alunoRoute');
+const instituicaoEnsinoRoutes = require('./src/routes/instituicaoEnsinoRoutes');
+
 app.use('/alunos', alunoRoutes);
+app.use('/instituicoes', instituicaoEnsinoRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {
