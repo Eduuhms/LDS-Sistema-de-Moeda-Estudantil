@@ -157,6 +157,128 @@ class AlunoController {
       return res.status(500).json({ erro: 'Falha ao buscar aluno. Por favor, tente novamente mais tarde.' });
     }
   }
+
+  static async atualizar(req, res) {
+    const { id } = req.params;
+    const { nome, email, endereco, curso, instituicaoEnsinoId } = req.body;
+    
+    if (!id || isNaN(parseInt(id))) {
+      return res.status(400).json({ erro: 'ID de aluno inválido' });
+    }
+    
+    try {
+      const aluno = await AlunoModel.buscarPorId(id);
+      
+      if (!aluno) {
+        return res.status(404).json({ erro: 'Aluno não encontrado. Verifique o ID informado.' });
+      }
+      
+      const usuarioId = aluno.usuario_id;
+      
+      if (!nome || !email || !endereco || !curso || !instituicaoEnsinoId) {
+        return res.status(400).json({ 
+          erro: 'Todos os campos são obrigatórios',
+          campos_faltantes: [
+            !nome && 'nome',
+            !email && 'email',
+            !endereco && 'endereco',
+            !curso && 'curso',
+            !instituicaoEnsinoId && 'instituição de ensino'
+          ].filter(Boolean)
+        });
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return res.status(400).json({ erro: 'Formato de e-mail inválido' });
+      }
+      
+      const usuarioExistente = await UsuarioModel.buscarPorEmail(email);
+      if (usuarioExistente && usuarioExistente.id !== usuarioId) {
+        return res.status(400).json({ erro: 'E-mail já cadastrado para outro usuário.' });
+      }
+      
+      const instituicao = await InstituicaoEnsinoModel.buscarPorId(instituicaoEnsinoId);
+      if (!instituicao) {
+        return res.status(404).json({ 
+          erro: 'Instituição de ensino não encontrada. Por favor, selecione uma instituição válida.' 
+        });
+      }
+      
+      const connection = await db.getConnection();
+      await connection.beginTransaction();
+      
+      try {
+        await UsuarioModel.atualizar(usuarioId, {
+          nome,
+          email
+        });
+        
+        await AlunoModel.atualizar(id, {
+          endereco,
+          curso,
+          instituicaoEnsinoId
+        });
+        
+        await connection.commit();
+        
+        const alunoAtualizado = await AlunoModel.buscarPorId(id);
+        
+        return res.status(200).json({
+          mensagem: 'Aluno atualizado com sucesso',
+          aluno: alunoAtualizado
+        });
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
+    } catch (error) {
+      console.error('Erro ao atualizar aluno:', error);
+      return res.status(500).json({ erro: 'Erro ao atualizar aluno. Por favor, tente novamente mais tarde.' });
+    }
+  }
+
+  static async excluir(req, res) {
+    const { id } = req.params;
+    
+    if (!id || isNaN(parseInt(id))) {
+      return res.status(400).json({ erro: 'ID de aluno inválido' });
+    }
+    
+    try {
+      const aluno = await AlunoModel.buscarPorId(id);
+      
+      if (!aluno) {
+        return res.status(404).json({ erro: 'Aluno não encontrado. Verifique o ID informado.' });
+      }
+      
+      const usuarioId = aluno.usuario_id;
+      
+      const connection = await db.getConnection();
+      await connection.beginTransaction();
+      
+      try {
+        await AlunoModel.excluir(id);
+        await UsuarioModel.excluir(usuarioId);
+        
+        await connection.commit();
+        
+        return res.status(200).json({
+          mensagem: 'Aluno excluído com sucesso'
+        });
+      } catch (error) {
+        await connection.rollback();
+        throw error;
+      } finally {
+        connection.release();
+      }
+    } catch (error) {
+      console.error('Erro ao excluir aluno:', error);
+      return res.status(500).json({ erro: 'Erro ao excluir aluno. Por favor, tente novamente mais tarde.' });
+    }
+  }
 }
 
 module.exports = AlunoController;

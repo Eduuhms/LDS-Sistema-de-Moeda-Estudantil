@@ -34,7 +34,7 @@ const pool = mysql.createPool({
           nome VARCHAR(100) NOT NULL,
           email VARCHAR(100) NOT NULL UNIQUE,
           senha VARCHAR(255) NOT NULL,
-          tipo ENUM('admin', 'professor', 'aluno') DEFAULT 'aluno',
+          tipo ENUM('empresa', 'professor', 'aluno') DEFAULT 'aluno',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
@@ -55,6 +55,22 @@ const pool = mysql.createPool({
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
           FOREIGN KEY (instituicao_ensino_id) REFERENCES instituicoes_ensino(id)
+        )
+      `);
+      
+      // Tabela de empresas parceiras
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS empresas (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          usuario_id INT NOT NULL,
+          cnpj VARCHAR(20) NOT NULL UNIQUE,
+          endereco VARCHAR(255) NOT NULL,
+          telefone VARCHAR(20),
+          email VARCHAR(100) NOT NULL,
+          descricao TEXT,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
         )
       `);
       

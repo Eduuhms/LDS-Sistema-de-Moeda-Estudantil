@@ -16,9 +16,11 @@ app.set('view engine', 'ejs');
 // Rotas
 const alunoRoutes = require('./src/routes/alunoRoute');
 const instituicaoEnsinoRoutes = require('./src/routes/instituicaoEnsinoRoutes');
+const empresaRoutes = require('./src/routes/empresaRoutes');
 
 app.use('/alunos', alunoRoutes);
 app.use('/instituicoes', instituicaoEnsinoRoutes);
+app.use('/empresas', empresaRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {

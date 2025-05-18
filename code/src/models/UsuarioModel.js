@@ -30,6 +30,30 @@ class UsuarioModel {
     const [usuarios] = await db.query('SELECT id, nome, email, tipo FROM usuarios');
     return usuarios;
   }
+  
+  static async atualizar(id, usuario) {
+    const { nome, email, senha } = usuario;
+    
+    if (senha) {
+      const senhaCriptografada = await bcrypt.hash(senha, 10);
+      await db.query(
+        'UPDATE usuarios SET nome = ?, email = ?, senha = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [nome, email, senhaCriptografada, id]
+      );
+    } else {
+      await db.query(
+        'UPDATE usuarios SET nome = ?, email = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        [nome, email, id]
+      );
+    }
+  }
+  
+  static async excluir(id) {
+    await db.query(
+      'DELETE FROM usuarios WHERE id = ?',
+      [id]
+    );
+  }
 }
 
 module.exports = UsuarioModel;

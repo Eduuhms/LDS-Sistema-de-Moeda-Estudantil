@@ -60,6 +60,22 @@ class AlunoModel {
     return alunos;
   }
   
+  static async atualizar(id, aluno) {
+    const { endereco, curso, instituicaoEnsinoId } = aluno;
+    
+    await db.query(
+      'UPDATE alunos SET endereco = ?, curso = ?, instituicao_ensino_id = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [endereco, curso, instituicaoEnsinoId, id]
+    );
+  }
+  
+  static async excluir(id) {
+    await db.query(
+      'DELETE FROM alunos WHERE id = ?',
+      [id]
+    );
+  }
+  
   static async atualizarSaldo(id, novoSaldo) {
     await db.query(
       'UPDATE alunos SET saldo = ? WHERE id = ?',
