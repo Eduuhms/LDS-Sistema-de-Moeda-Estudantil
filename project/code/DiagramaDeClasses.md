@@ -1,5 +1,4 @@
 ```code
-
 @startuml
 abstract class Usuario {
   - id: Int
@@ -14,7 +13,7 @@ class Aluno extends Usuario implements GerenciadorMoedas {
   - rg: String
   - endereco: String
   - curso: String
-  - saldoMoedas: Int
+  - saldo: Int
   - instituicaoEnsino: InstituicaoEnsino
   + resgatarVantagem(vantagem: Vantagem): Resgate
   + receberMoedas(quantidade: Int, mensagem: String, professor: Professor): void
@@ -24,7 +23,7 @@ class Professor extends Usuario implements GerenciadorMoedas {
   - cpf: String
   - departamento: String
   - instituicaoEnsino: InstituicaoEnsino
-  - saldoMoedas: Int
+  - saldo: Int
   + enviarMoedas(aluno: Aluno, quantidade: Int, mensagem: String): boolean
   + recarregarMoedasSemestrais(): void
 }
@@ -32,7 +31,7 @@ class Professor extends Usuario implements GerenciadorMoedas {
 class EmpresaParceira extends Usuario {
   - cnpj: String
   - descricao: String
-  - enderecoFisico: String
+  - endereco: String
   + cadastrarVantagem(vantagem: Vantagem): void
   + editarVantagem(vantagem: Vantagem): void
   + removerVantagem(vantagem: Vantagem): void
@@ -89,6 +88,12 @@ enum StatusResgate {
   PENDENTE,
   UTILIZADO,
   EXPIRADO
+}
+
+enum TipoUsuario {
+    aluno,
+    professor,
+    empresa
 }
 
 class EmailService {
