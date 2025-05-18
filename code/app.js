@@ -7,11 +7,16 @@ const app = express();
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // View engine
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
+
+// Rota página inicial
+app.get('/', (req, res) => {
+  res.render('index');
+});
 
 // Rotas
 const alunoRoutes = require('./src/routes/alunoRoute');

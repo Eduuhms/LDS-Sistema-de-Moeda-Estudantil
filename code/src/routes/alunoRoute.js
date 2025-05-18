@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const AlunoController = require('../controllers/AlunoController');
 
+router.get('/cadastro', AlunoController.exibirFormulario);
 router.post('/cadastrar', AlunoController.cadastrar);
 router.get('/', AlunoController.listar);
 router.get('/:id', AlunoController.buscarPorId);

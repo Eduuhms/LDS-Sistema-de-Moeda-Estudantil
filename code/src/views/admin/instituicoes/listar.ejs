@@ -3,18 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Gerenciar Instituições de Ensino</title>
-  <link rel="stylesheet" href="/css/styles.css">
+  <title>Instituições de Ensino</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #f8f8f8;
+      font-weight: bold;
+    }
+    tr:hover {
+      background-color: #f5f5f5;
+    }
+    .btn {
+      display: inline-block;
+      padding: 8px 15px;
+      margin-right: 5px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-danger {
+      background-color: #dc3545;
+      color: white;
+    }
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 20px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <h1>Gerenciar Instituições de Ensino</h1>
+    <h1>Instituições de Ensino</h1>
     
     <div class="actions">
-      <button id="btn-nova-instituicao" class="btn-primary">Nova Instituição</button>
+      <button id="btn-nova-instituicao" class="btn btn-primary">Nova Instituição</button>
     </div>
     
-    <table class="table">
+    <table>
       <thead>
         <tr>
           <th>ID</th>
@@ -26,225 +89,127 @@
         </tr>
       </thead>
       <tbody id="tabela-instituicoes">
-        <!-- Dados carregados via JavaScript -->
+        <% if (instituicoes && instituicoes.length > 0) { %>
+          <% instituicoes.forEach(instituicao => { %>
+            <tr>
+              <td><%= instituicao.id %></td>
+              <td><%= instituicao.nome %></td>
+              <td><%= instituicao.cnpj %></td>
+              <td><%= instituicao.endereco %></td>
+              <td><%= instituicao.telefone || 'Não informado' %></td>
+              <td>
+                <button class="btn btn-secondary btn-editar" data-id="<%= instituicao.id %>">Editar</button>
+                <button class="btn btn-danger btn-excluir" data-id="<%= instituicao.id %>">Excluir</button>
+              </td>
+            </tr>
+          <% }); %>
+        <% } else { %>
+          <tr>
+            <td colspan="6" style="text-align: center;">Nenhuma instituição de ensino cadastrada.</td>
+          </tr>
+        <% } %>
       </tbody>
     </table>
-    
-    <!-- Modal de Cadastro/Edição -->
-    <div id="modal-instituicao" class="modal">
-      <div class="modal-content">
-        <span class="close">&times;</span>
-        <h2 id="modal-titulo">Nova Instituição de Ensino</h2>
-        
-        <form id="form-instituicao">
-          <input type="hidden" id="instituicao-id">
-          
-          <div class="form-group">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="cnpj">CNPJ:</label>
-            <input type="text" id="cnpj" name="cnpj" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="endereco">Endereço:</label>
-            <input type="text" id="endereco" name="endereco" required>
-          </div>
-          
-          <div class="form-group">
-            <label for="telefone">Telefone:</label>
-            <input type="text" id="telefone" name="telefone">
-          </div>
-          
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">Salvar</button>
-            <button type="button" class="btn-secondary" id="btn-cancelar">Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
   </div>
-  
+
   <script>
-    let token = localStorage.getItem('token');
-    const modal = document.getElementById('modal-instituicao');
-    const form = document.getElementById('form-instituicao');
-    const btnNovaInstituicao = document.getElementById('btn-nova-instituicao');
-    const btnCancelar = document.getElementById('btn-cancelar');
-    const closeBtn = document.querySelector('.close');
-    
-    // Carregar instituições
-    async function carregarInstituicoes() {
-      try {
-        const response = await fetch('/instituicoes', {
-          headers: {
-            'Authorization': `Bearer ${token}`
+    document.addEventListener('DOMContentLoaded', function() {
+      // Função para carregar instituições
+      async function carregarInstituicoes() {
+        try {
+          const response = await fetch('/instituicoes');
+          
+          if (!response.ok) {
+            throw new Error('Falha ao carregar instituições');
           }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Falha ao carregar instituições');
-        }
-        
-        const instituicoes = await response.json();
-        const tabela = document.getElementById('tabela-instituicoes');
-        tabela.innerHTML = '';
-        
-        instituicoes.forEach(instituicao => {
-          const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td>${instituicao.id}</td>
-            <td>${instituicao.nome}</td>
-            <td>${instituicao.cnpj}</td>
-            <td>${instituicao.endereco}</td>
-            <td>${instituicao.telefone || '-'}</td>
-            <td>
-              <button class="btn-edit" data-id="${instituicao.id}">Editar</button>
-              <button class="btn-delete" data-id="${instituicao.id}">Excluir</button>
-            </td>
-          `;
-          tabela.appendChild(tr);
-        });
-        
-        // Adicionar event listeners para botões de editar e excluir
-        document.querySelectorAll('.btn-edit').forEach(btn => {
-          btn.addEventListener('click', () => editarInstituicao(btn.dataset.id));
-        });
-        
-        document.querySelectorAll('.btn-delete').forEach(btn => {
-          btn.addEventListener('click', () => excluirInstituicao(btn.dataset.id));
-        });
-      } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao carregar instituições.');
-      }
-    }
-    
-    // Carregar dados de uma instituição para edição
-    async function editarInstituicao(id) {
-      try {
-        const response = await fetch(`/instituicoes/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
+          
+          const instituicoes = await response.json();
+          const tbody = document.getElementById('tabela-instituicoes');
+          
+          tbody.innerHTML = '';
+          
+          if (instituicoes.length === 0) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td colspan="6" style="text-align: center;">Nenhuma instituição de ensino cadastrada.</td>`;
+            tbody.appendChild(tr);
+            return;
           }
-        });
-        
-        if (!response.ok) {
-          throw new Error('Falha ao carregar dados da instituição');
+          
+          instituicoes.forEach(instituicao => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${instituicao.id}</td>
+              <td>${instituicao.nome}</td>
+              <td>${instituicao.cnpj}</td>
+              <td>${instituicao.endereco}</td>
+              <td>${instituicao.telefone || 'Não informado'}</td>
+              <td>
+                <button class="btn btn-secondary btn-editar" data-id="${instituicao.id}">Editar</button>
+                <button class="btn btn-danger btn-excluir" data-id="${instituicao.id}">Excluir</button>
+              </td>
+            `;
+            tbody.appendChild(tr);
+          });
+          
+          // Anexar eventos aos botões
+          document.querySelectorAll('.btn-editar').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const id = e.target.getAttribute('data-id');
+              editarInstituicao(id);
+            });
+          });
+          
+          document.querySelectorAll('.btn-excluir').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const id = e.target.getAttribute('data-id');
+              excluirInstituicao(id);
+            });
+          });
+          
+        } catch (error) {
+          console.error('Erro ao carregar instituições:', error);
+          alert('Não foi possível carregar a lista de instituições. Por favor, tente novamente mais tarde.');
         }
-        
-        const instituicao = await response.json();
-        
-        document.getElementById('instituicao-id').value = instituicao.id;
-        document.getElementById('nome').value = instituicao.nome;
-        document.getElementById('cnpj').value = instituicao.cnpj;
-        document.getElementById('endereco').value = instituicao.endereco;
-        document.getElementById('telefone').value = instituicao.telefone || '';
-        
-        document.getElementById('modal-titulo').textContent = 'Editar Instituição de Ensino';
-        modal.style.display = 'block';
-      } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro ao carregar dados da instituição.');
-      }
-    }
-    
-    // Excluir instituição
-    async function excluirInstituicao(id) {
-      if (!confirm('Tem certeza que deseja excluir esta instituição?')) {
-        return;
       }
       
-      try {
-        const response = await fetch(`/instituicoes/${id}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.erro || 'Falha ao excluir instituição');
-        }
-        
-        alert('Instituição excluída com sucesso!');
-        carregarInstituicoes();
-      } catch (error) {
-        console.error('Erro:', error);
-        alert(`Erro ao excluir instituição: ${error.message}`);
-      }
-    }
-    
-    // Event Listeners
-    document.addEventListener('DOMContentLoaded', () => {
+      // Carrega instituições ao iniciar
       carregarInstituicoes();
-    });
-    
-    btnNovaInstituicao.addEventListener('click', () => {
-      // Limpar formulário
-      form.reset();
-      document.getElementById('instituicao-id').value = '';
-      document.getElementById('modal-titulo').textContent = 'Nova Instituição de Ensino';
-      modal.style.display = 'block';
-    });
-    
-    closeBtn.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-    
-    btnCancelar.addEventListener('click', () => {
-      modal.style.display = 'none';
-    });
-    
-    // Fechar modal quando clicar fora dele
-    window.addEventListener('click', (event) => {
-      if (event.target === modal) {
-        modal.style.display = 'none';
+      
+      // Evento para nova instituição
+      document.getElementById('btn-nova-instituicao').addEventListener('click', () => {
+        // Aqui você pode implementar o código para abrir um modal
+        // ou redirecionar para uma página de criação de instituição
+        alert('Funcionalidade para criar nova instituição a ser implementada');
+      });
+      
+      // Função para editar instituição
+      function editarInstituicao(id) {
+        alert(`Funcionalidade para editar instituição ID ${id} a ser implementada`);
       }
-    });
-    
-    // Enviar formulário
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
       
-      const id = document.getElementById('instituicao-id').value;
-      const isEdicao = id !== '';
-      
-      const formData = {
-        nome: document.getElementById('nome').value,
-        cnpj: document.getElementById('cnpj').value,
-        endereco: document.getElementById('endereco').value,
-        telefone: document.getElementById('telefone').value
-      };
-      
-      try {
-        const url = isEdicao ? `/instituicoes/${id}` : '/instituicoes';
-        const method = isEdicao ? 'PUT' : 'POST';
-        
-        const response = await fetch(url, {
-          method: method,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(formData)
-        });
-        
-        if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.erro || 'Erro ao salvar instituição');
+      // Função para excluir instituição
+      async function excluirInstituicao(id) {
+        if (!confirm('Tem certeza que deseja excluir esta instituição?')) {
+          return;
         }
         
-        alert(isEdicao ? 'Instituição atualizada com sucesso!' : 'Instituição cadastrada com sucesso!');
-        modal.style.display = 'none';
-        carregarInstituicoes();
-      } catch (error) {
-        console.error('Erro:', error);
-        alert(`Erro ao salvar instituição: ${error.message}`);
+        try {
+          const response = await fetch(`/instituicoes/${id}`, {
+            method: 'DELETE'
+          });
+          
+          const data = await response.json();
+          
+          if (response.ok) {
+            alert('Instituição excluída com sucesso!');
+            carregarInstituicoes();
+          } else {
+            alert(data.erro || 'Não foi possível excluir a instituição.');
+          }
+        } catch (error) {
+          console.error('Erro ao excluir instituição:', error);
+          alert('Ocorreu um erro ao tentar excluir a instituição. Por favor, tente novamente mais tarde.');
+        }
       }
     });
   </script>

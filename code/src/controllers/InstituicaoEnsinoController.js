@@ -1,6 +1,18 @@
 const InstituicaoEnsinoModel = require('../models/InstituicaoEnsinoModel');
 
 class InstituicaoEnsinoController {
+  static async exibirListagem(req, res) {
+    try {
+      const instituicoes = await InstituicaoEnsinoModel.listar();
+      res.render('admin/instituicoes/listar', { instituicoes });
+    } catch (error) {
+      res.status(500).render('error', { 
+        message: 'Erro ao carregar instituições de ensino', 
+        error 
+      });
+    }
+  }
+
   static async listar(req, res) {
     try {
       const instituicoes = await InstituicaoEnsinoModel.listar();
