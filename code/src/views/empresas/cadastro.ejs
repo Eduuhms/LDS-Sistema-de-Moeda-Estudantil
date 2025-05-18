@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestão de Empresas Parceiras</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --danger: #e63946;
+      --success: #2a9d8f;
+      --warning: #f4a261;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body {
+      background-color: #f5f7fa;
+      color: var(--dark);
+      line-height: 1.6;
+      padding-top: 40px;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      gap: 1rem;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    h1 {
+      color: var(--primary);
+      flex-grow: 1;
+    }
+    
+    .btn {
+      padding: 0.6rem 1.2rem;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+      text-align: center;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .btn-secondary {
+      background-color: var(--gray);
+      color: white;
+    }
+    
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+    
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .btn-warning {
+      background-color: var(--warning);
+      color: white;
+    }
+    
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .alerts {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      animation: slideIn 0.3s ease-out;
+    }
+    
+    .alert-success {
+      background-color: #d1e7dd;
+      color: #0f5132;
+      border-left: 4px solid var(--success);
+    }
+    
+    .alert-error {
+      background-color: #f8d7da;
+      color: #842029;
+      border-left: 4px solid var(--danger);
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .table-container {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      overflow-x: auto;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    
+    th, td {
+      padding: 1rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+    
+    th {
+      background-color: #f8f9fa;
+      font-weight: 600;
+      color: var(--dark);
+    }
+    
+    tr:hover {
+      background-color: #f8f9fa;
+    }
+    
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .modal-title {
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    
+    .close {
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    
+    .form-group {
+      margin-bottom: 1rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .error-message {
+      color: var(--danger);
+      font-size: 0.8rem;
+      margin-top: 0.3rem;
+      display: none;
+    }
+    
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .header-actions {
+        width: 100%;
+        justify-content: space-between;
+        margin-top: 1rem;
+      }
+      
+      th, td {
+        padding: 0.75rem 0.5rem;
+      }
+      
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Gestão de Empresas Parceiras</h1>
+      <div class="header-actions">
+        <a href="/" class="btn btn-secondary">Voltar</a>
+        <button id="btnNovaEmpresa" class="btn btn-primary">Nova Empresa</button>
+      </div>
+    </header>
+    
+    <div class="table-container">
+      <table id="tabelaEmpresas">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>CNPJ</th>
+            <th>E-mail</th>
+            <th>Telefone</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Os dados serão carregados via JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Modal para cadastro/edição -->
+  <div id="modalEmpresa" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitulo">Nova Empresa</h2>
+        <span class="close">&times;</span>
+      </div>
+      
+      <form id="formEmpresa">
+        <input type="hidden" id="empresaId">
+        
+        <div class="form-group">
+          <label for="nome">Nome da Empresa</label>
+          <input type="text" id="nome" name="nome" required>
+          <div class="error-message" id="erroNome"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="cnpj">CNPJ</label>
+          <input type="text" id="cnpj" name="cnpj" placeholder="00.000.000/0000-00" required>
+          <div class="error-message" id="erroCnpj"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" name="email" required>
+          <div class="error-message" id="erroEmail"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" name="senha">
+          <div class="error-message" id="erroSenha"></div>
+          <small>Deixe em branco para manter a senha atual</small>
+        </div>
+        
+        <div class="form-group">
+          <label for="endereco">Endereço</label>
+          <input type="text" id="endereco" name="endereco" required>
+          <div class="error-message" id="erroEndereco"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="telefone">Telefone</label>
+          <input type="text" id="telefone" name="telefone" placeholder="(00) 00000-0000">
+          <div class="error-message" id="erroTelefone"></div>
+        </div>
+        
+        <div class="form-group">
+          <label for="descricao">Descrição</label>
+          <textarea id="descricao" name="descricao"></textarea>
+          <div class="error-message" id="erroDescricao"></div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" class="btn" id="btnCancelar">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btnSalvar">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Área para mensagens -->
+  <div class="alerts" id="alerts"></div>
+  
+  <script>
+    // Variáveis globais
+    let empresas = [];
+    let empresaEditando = null;
+    
+    // Elementos DOM
+    const modal = document.getElementById('modalEmpresa');
+    const btnNovaEmpresa = document.getElementById('btnNovaEmpresa');
+    const btnCancelar = document.getElementById('btnCancelar');
+    const btnSalvar = document.getElementById('btnSalvar');
+    const formEmpresa = document.getElementById('formEmpresa');
+    const tabelaEmpresas = document.getElementById('tabelaEmpresas').getElementsByTagName('tbody')[0];
+    const closeModal = document.querySelector('.close');
+    const alertsContainer = document.getElementById('alerts');
+    
+    // Event Listeners
+    document.addEventListener('DOMContentLoaded', carregarDados);
+    btnNovaEmpresa.addEventListener('click', abrirModalNovaEmpresa);
+    btnCancelar.addEventListener('click', fecharModal);
+    closeModal.addEventListener('click', fecharModal);
+    formEmpresa.addEventListener('submit', salvarEmpresa);
+    
+    // Funções
+    async function carregarDados() {
+      try {
+        // Carregar empresas
+        const resEmpresas = await fetch('/empresas');
+        if (!resEmpresas.ok) throw new Error('Erro ao carregar empresas');
+        empresas = await resEmpresas.json();
+        
+        // Popular tabela
+        atualizarTabela();
+        
+      } catch (error) {
+        mostrarAlerta('error', error.message);
+      }
+    }
+    
+    function atualizarTabela() {
+      tabelaEmpresas.innerHTML = '';
+      
+      empresas.forEach(empresa => {
+        const row = tabelaEmpresas.insertRow();
+        
+        row.innerHTML = `
+          <td>${empresa.nome}</td>
+          <td>${formatarCNPJ(empresa.cnpj)}</td>
+          <td>${empresa.email}</td>
+          <td>${formatarTelefone(empresa.telefone)}</td>
+          <td>
+            <div class="actions">
+              <button class="btn btn-warning btn-editar" data-id="${empresa.id}">Editar</button>
+              <button class="btn btn-danger btn-excluir" data-id="${empresa.id}">Excluir</button>
+            </div>
+          </td>
+        `;
+      });
+      
+      // Adicionar eventos aos botões de editar e excluir
+      document.querySelectorAll('.btn-editar').forEach(btn => {
+        btn.addEventListener('click', () => abrirModalEditar(btn.dataset.id));
+      });
+      
+      document.querySelectorAll('.btn-excluir').forEach(btn => {
+        btn.addEventListener('click', () => confirmarExclusao(btn.dataset.id));
+      });
+    }
+    
+    function formatarCNPJ(cnpj) {
+      if (!cnpj) return '';
+      return cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+    }
+    
+    function formatarTelefone(telefone) {
+      if (!telefone) return '';
+      // Remove tudo que não é dígito
+      const nums = telefone.replace(/\D/g, '');
+      // Formata (00) 00000-0000
+      return nums.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+    }
+    
+    function abrirModalNovaEmpresa() {
+      document.getElementById('modalTitulo').textContent = 'Nova Empresa';
+      formEmpresa.reset();
+      document.getElementById('empresaId').value = '';
+      empresaEditando = null;
+      modal.style.display = 'flex';
+    }
+    
+    function abrirModalEditar(id) {
+      empresaEditando = empresas.find(e => e.id == id);
+      if (!empresaEditando) return;
+      
+      document.getElementById('modalTitulo').textContent = 'Editar Empresa';
+      document.getElementById('empresaId').value = empresaEditando.id;
+      document.getElementById('nome').value = empresaEditando.nome;
+      document.getElementById('cnpj').value = formatarCNPJ(empresaEditando.cnpj);
+      document.getElementById('email').value = empresaEditando.email;
+      document.getElementById('endereco').value = empresaEditando.endereco;
+      document.getElementById('telefone').value = empresaEditando.telefone;
+      document.getElementById('descricao').value = empresaEditando.descricao;
+      
+      modal.style.display = 'flex';
+    }
+    
+    function fecharModal() {
+      modal.style.display = 'none';
+      limparErros();
+    }
+    
+    function limparErros() {
+      document.querySelectorAll('.error-message').forEach(el => {
+        el.style.display = 'none';
+      });
+    }
+    
+    function mostrarErro(campo, mensagem) {
+      const erroElement = document.getElementById(`erro${campo.charAt(0).toUpperCase() + campo.slice(1)}`);
+      erroElement.textContent = mensagem;
+      erroElement.style.display = 'block';
+      document.getElementById(campo).style.borderColor = 'var(--danger)';
+    }
+    
+    async function salvarEmpresa(e) {
+      e.preventDefault();
+      limparErros();
+      
+      const formData = {
+        id: document.getElementById('empresaId').value,
+        nome: document.getElementById('nome').value,
+        cnpj: document.getElementById('cnpj').value.replace(/\D/g, ''),
+        email: document.getElementById('email').value,
+        senha: document.getElementById('senha').value,
+        endereco: document.getElementById('endereco').value,
+        telefone: document.getElementById('telefone').value.replace(/\D/g, ''),
+        descricao: document.getElementById('descricao').value
+      };
+      
+      // Validações básicas
+      let valido = true;
+      
+      if (!formData.nome) {
+        mostrarErro('nome', 'Por favor, informe o nome da empresa');
+        valido = false;
+      }
+      
+      if (!formData.cnpj || formData.cnpj.length !== 14) {
+        mostrarErro('cnpj', 'CNPJ deve ter 14 dígitos');
+        valido = false;
+      }
+      
+      if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+        mostrarErro('email', 'Por favor, informe um e-mail válido');
+        valido = false;
+      }
+      
+      if (!empresaEditando && !formData.senha) {
+        mostrarErro('senha', 'Por favor, informe uma senha');
+        valido = false;
+      }
+      
+      if (!formData.endereco) {
+        mostrarErro('endereco', 'Por favor, informe o endereço');
+        valido = false;
+      }
+      
+      if (!valido) return;
+      
+      try {
+        let response;
+        
+        if (empresaEditando) {
+          // Edição
+          response = await fetch(`/empresas/atualizar/${formData.id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+        } else {
+          // Cadastro
+          response = await fetch('/empresas/cadastrar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+        }
+        
+        const data = await response.json();
+        
+        if (!response.ok) {
+          throw new Error(data.erro || 'Erro ao salvar empresa');
+        }
+        
+        mostrarAlerta('success', empresaEditando ? 'Empresa atualizada com sucesso!' : 'Empresa cadastrada com sucesso!');
+        fecharModal();
+        await carregarDados();
+        
+      } catch (error) {
+        mostrarAlerta('error', error.message);
+      }
+    }
+    
+    async function confirmarExclusao(id) {
+      if (!confirm('Tem certeza que deseja excluir esta empresa?')) return;
+      
+      try {
+        const response = await fetch(`/empresas/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erro ao excluir empresa');
+        }
+        
+        mostrarAlerta('success', 'Empresa excluída com sucesso!');
+        await carregarDados();
+        
+      } catch (error) {
+        mostrarAlerta('error', error.message);
+      }
+    }
+    
+    function mostrarAlerta(tipo, mensagem) {
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${tipo}`;
+      alert.innerHTML = `
+        <span>${mensagem}</span>
+        <button onclick="this.parentElement.remove()">&times;</button>
+      `;
+      
+      alertsContainer.appendChild(alert);
+      
+      setTimeout(() => {
+        alert.remove();
+      }, 5000);
+    }
+    
+    // Formatar CNPJ durante digitação
+    document.getElementById('cnpj').addEventListener('input', function(e) {
+      let cnpj = e.target.value.replace(/\D/g, '');
+      if (cnpj.length > 14) cnpj = cnpj.substring(0, 14);
+      
+      if (cnpj.length > 12) {
+        cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+      } else if (cnpj.length > 8) {
+        cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})$/, '$1.$2.$3/$4');
+      } else if (cnpj.length > 5) {
+        cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})$/, '$1.$2.$3');
+      } else if (cnpj.length > 2) {
+        cnpj = cnpj.replace(/^(\d{2})(\d{3})$/, '$1.$2');
+      }
+      
+      e.target.value = cnpj;
+    });
+    
+    // Formatar telefone durante digitação
+    document.getElementById('telefone').addEventListener('input', function(e) {
+      let telefone = e.target.value.replace(/\D/g, '');
+      if (telefone.length > 11) telefone = telefone.substring(0, 11);
+      
+      if (telefone.length > 6) {
+        telefone = telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+      } else if (telefone.length > 2) {
+        telefone = telefone.replace(/^(\d{2})(\d{4})$/, '($1) $2');
+      } else if (telefone.length > 0) {
+        telefone = telefone.replace(/^(\d{2})$/, '($1)');
+      }
+      
+      e.target.value = telefone;
+    });
+  </script>
+</body>
+</html>

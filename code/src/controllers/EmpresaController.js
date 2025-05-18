@@ -1,6 +1,12 @@
 const EmpresaModel = require('../models/EmpresaModel');
 
 class EmpresaController {
+  // Renderiza a página de cadastro
+  static async exibirFormulario(req, res) {
+    res.render('empresas/cadastro');
+  }
+
+  // Lista todas as empresas (para API)
   static async listar(req, res) {
     try {
       const empresas = await EmpresaModel.listar();
@@ -13,10 +19,12 @@ class EmpresaController {
     }
   }
 
+  // Cadastra uma nova empresa
   static async cadastrar(req, res) {
     try {
       const { nome, cnpj, endereco, telefone, email, senha, descricao } = req.body;
       
+      // Validações básicas
       if (!nome || !cnpj || !endereco || !email || !senha) {
         return res.status(400).json({ 
           erro: 'Nome, CNPJ, endereço, e-mail e senha são campos obrigatórios',
@@ -30,17 +38,20 @@ class EmpresaController {
         });
       }
       
-      const cnpjLimpo = cnpj.replace(/[^\d]/g, '');
+      // Validação do CNPJ (apenas quantidade de dígitos)
+      const cnpjLimpo = cnpj.replace(/\D/g, '');
       if (cnpjLimpo.length !== 14) {
-        return res.status(400).json({ erro: 'CNPJ inválido. Um CNPJ válido deve conter 14 dígitos.' });
+        return res.status(400).json({ erro: 'CNPJ inválido. Deve conter 14 dígitos.' });
       }
       
+      // Validação de e-mail
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({ erro: 'Formato de e-mail inválido' });
       }
       
-      const empresaExistente = await EmpresaModel.buscarPorCnpj(cnpj);
+      // Verifica se CNPJ já existe
+      const empresaExistente = await EmpresaModel.buscarPorCnpj(cnpjLimpo);
       if (empresaExistente) {
         return res.status(400).json({ 
           erro: 'CNPJ já cadastrado. Já existe uma empresa com este CNPJ.',
@@ -51,7 +62,7 @@ class EmpresaController {
         });
       }
       
-      // Verifica se já existe um usuário com este e-mail
+      // Verifica se e-mail já existe
       const usuarioExistente = await EmpresaModel.buscarPorEmail(email);
       if (usuarioExistente) {
         return res.status(400).json({ 
@@ -59,16 +70,18 @@ class EmpresaController {
         });
       }
       
+      // Cria a empresa
       const empresaId = await EmpresaModel.criar({
         nome,
-        cnpj,
+        cnpj: cnpjLimpo,
         endereco,
-        telefone,
+        telefone: telefone ? telefone.replace(/\D/g, '') : null,
         email,
         senha,
         descricao
       });
       
+      // Busca os dados da empresa criada
       const empresa = await EmpresaModel.buscarPorId(empresaId);
       
       return res.status(201).json({
@@ -83,6 +96,7 @@ class EmpresaController {
           descricao: empresa.descricao
         }
       });
+      
     } catch (error) {
       if (error.code === 'ER_DUP_ENTRY') {
         return res.status(400).json({ erro: 'Informação duplicada. Verifique os dados e tente novamente.' });
@@ -95,6 +109,7 @@ class EmpresaController {
     }
   }
 
+  // Busca uma empresa por ID
   static async buscarPorId(req, res) {
     try {
       const { id } = req.params;
@@ -126,6 +141,7 @@ class EmpresaController {
     }
   }
   
+  // Atualiza uma empresa
   static async atualizar(req, res) {
     try {
       const { id } = req.params;
@@ -135,6 +151,7 @@ class EmpresaController {
         return res.status(400).json({ erro: 'ID de empresa inválido' });
       }
       
+      // Validações básicas
       if (!nome || !cnpj || !endereco || !email) {
         return res.status(400).json({ 
           erro: 'Nome, CNPJ, endereço e e-mail são campos obrigatórios',
@@ -147,11 +164,13 @@ class EmpresaController {
         });
       }
       
+      // Validação de e-mail
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return res.status(400).json({ erro: 'Formato de e-mail inválido' });
       }
       
+      // Busca a empresa existente
       const empresaExistente = await EmpresaModel.buscarPorId(id);
       if (!empresaExistente) {
         return res.status(404).json({ 
@@ -159,8 +178,10 @@ class EmpresaController {
         });
       }
       
-      if (cnpj !== empresaExistente.cnpj) {
-        const cnpjExistente = await EmpresaModel.buscarPorCnpj(cnpj);
+      // Valida se CNPJ foi alterado e se já existe
+      const cnpjLimpo = cnpj.replace(/\D/g, '');
+      if (cnpjLimpo !== empresaExistente.cnpj) {
+        const cnpjExistente = await EmpresaModel.buscarPorCnpj(cnpjLimpo);
         if (cnpjExistente && cnpjExistente.id !== parseInt(id)) {
           return res.status(400).json({ 
             erro: 'CNPJ já cadastrado para outra empresa. Cada empresa deve ter um CNPJ único.' 
@@ -168,6 +189,7 @@ class EmpresaController {
         }
       }
       
+      // Valida se e-mail foi alterado e se já existe
       if (email !== empresaExistente.email) {
         const emailExistente = await EmpresaModel.buscarPorEmail(email);
         if (emailExistente && emailExistente.id !== empresaExistente.usuario_id) {
@@ -177,16 +199,18 @@ class EmpresaController {
         }
       }
       
+      // Atualiza a empresa
       await EmpresaModel.atualizar(id, {
         nome,
         email,
         senha,
-        cnpj,
+        cnpj: cnpjLimpo,
         endereco,
-        telefone,
+        telefone: telefone ? telefone.replace(/\D/g, '') : null,
         descricao
       });
       
+      // Busca os dados atualizados
       const empresaAtualizada = await EmpresaModel.buscarPorId(id);
       
       return res.status(200).json({
@@ -209,6 +233,7 @@ class EmpresaController {
     }
   }
   
+  // Exclui uma empresa
   static async excluir(req, res) {
     try {
       const { id } = req.params;
@@ -239,4 +264,4 @@ class EmpresaController {
   }
 }
 
-module.exports = EmpresaController; 
+module.exports = EmpresaController;
