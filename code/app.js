@@ -22,10 +22,12 @@ app.get('/', (req, res) => {
 const alunoRoutes = require('./src/routes/alunoRoute');
 const instituicaoEnsinoRoutes = require('./src/routes/instituicaoEnsinoRoutes');
 const empresaRoutes = require('./src/routes/empresaRoutes');
+const vantagemRoutes = require('./src/routes/vantagemRoute');
 
 app.use('/alunos', alunoRoutes);
 app.use('/instituicoes', instituicaoEnsinoRoutes);
 app.use('/empresas', empresaRoutes);
+app.use('/vantagens', vantagemRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {

@@ -73,6 +73,20 @@ const pool = mysql.createPool({
           FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
         )
       `);
+
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS vantagens (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          nome VARCHAR(100) NOT NULL,
+          descricao TEXT,
+          foto VARCHAR(255),
+          custo_moedas INT NOT NULL,
+          empresa_id INT NOT NULL,
+          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+          FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
+        )
+      `)
       
       console.log('Banco de dados inicializado com sucesso');
     } catch (error) {
