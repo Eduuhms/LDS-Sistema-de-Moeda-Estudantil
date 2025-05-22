@@ -1,11 +1,11 @@
 const VantagemModel = require('../models/VantagemModel');
 
 class VantagemController {
-    static async cadastrar(req, res){
+    static async cadastrar(req, res) {
         try {
-            const { nome, descricao, foto, custoMoedas, empresaId} = req.body;
+            const { nome, descricao, foto, custoMoedas, empresaId } = req.body;
 
-            if (!nome || !descricao || !foto || !custoMoedas || !empresaId){
+            if (!nome || !descricao || !foto || !custoMoedas || !empresaId) {
                 return res.status(400).json({
                     erro: 'Todos os campos são obrigatórios'
                 });
@@ -18,7 +18,6 @@ class VantagemController {
                 custoMoedas,
                 empresaId
             });
-            console.log(vantagem)
 
             return res.status(201).json({
                 mensagem: 'Vantagem cadastrada com sucesso',
@@ -35,6 +34,107 @@ class VantagemController {
             console.error('Erro ao cadastrar vantagem:', error);
             return res.status(500).json({
                 erro: 'Falha ao cadastrar vantagem. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async atualizar(req, res) {
+        try {
+            const { id } = req.params;
+            const { nome, descricao, foto, custoMoedas, empresaId } = req.body;
+
+            if (!nome || !descricao || !foto || !custoMoedas || !empresaId) {
+                return res.status(400).json({
+                    erro: 'Todos os campos são obrigatórios'
+                });
+            }
+
+            const atualizado = await VantagemModel.atualizar(id, {
+                nome,
+                descricao,
+                foto,
+                custoMoedas,
+                empresaId
+            });
+
+            if (!atualizado) {
+                return res.status(404).json({
+                    erro: 'Vantagem não encontrada'
+                });
+            }
+
+            return res.status(200).json({
+                mensagem: 'Vantagem atualizada com sucesso',
+                vantagem: {
+                    id,
+                    nome,
+                    descricao,
+                    foto,
+                    custoMoedas,
+                    empresaId
+                }
+            });
+        } catch (error) {
+            console.error('Erro ao atualizar vantagem:', error);
+            return res.status(500).json({
+                erro: 'Falha ao atualizar vantagem. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async deletar(req, res) {
+        try {
+            const { id } = req.params;
+
+            const deletado = await VantagemModel.deletar(id);
+
+            if (!deletado) {
+                return res.status(404).json({
+                    erro: 'Vantagem não encontrada'
+                });
+            }
+
+            return res.status(200).json({
+                mensagem: 'Vantagem deletada com sucesso'
+            });
+        } catch (error) {
+            console.error('Erro ao deletar vantagem:', error);
+            return res.status(500).json({
+                erro: 'Falha ao deletar vantagem. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async buscarTodos(req, res) {
+        try {
+            const vantagens = await VantagemModel.buscarTodos();
+
+            return res.status(200).json(vantagens);
+        } catch (error) {
+            console.error('Erro ao buscar vantagens:', error);
+            return res.status(500).json({
+                erro: 'Falha ao buscar vantagens. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
+
+    static async buscarPorId(req, res) {
+        try {
+            const { id } = req.params;
+
+            const vantagem = await VantagemModel.buscarPorId(id);
+
+            if (!vantagem) {
+                return res.status(404).json({
+                    erro: 'Vantagem não encontrada'
+                });
+            }
+
+            return res.status(200).json(vantagem);
+        } catch (error) {
+            console.error('Erro ao buscar vantagem:', error);
+            return res.status(500).json({
+                erro: 'Falha ao buscar vantagem. Por favor, tente novamente mais tarde.'
             });
         }
     }
