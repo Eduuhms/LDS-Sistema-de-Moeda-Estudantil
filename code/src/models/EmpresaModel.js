@@ -54,6 +54,20 @@ class EmpresaModel extends UsuarioModel {
       descricao: empresas[0].descricao
     };
   }
+
+  static async buscarPorUsuarioId(usuarioId) {
+  const [empresas] = await db.query(
+    'SELECT * FROM empresas WHERE usuario_id = ?',
+    [usuarioId]
+  );
+  
+  if (empresas.length === 0) {
+    return null;
+  }
+  
+  return empresas[0];
+}
+
   
   static async buscarPorCnpj(cnpj) {
     const [empresas] = await db.query(

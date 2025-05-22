@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #28a745;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .welcome-message {
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: var(--success);
+    }
+    
+    .user-info {
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+    }
+    
+    .logout-btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+    
+    .logout-btn:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .actions {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Dashboard</h1>
+    
+    <div class="welcome-message" id="welcomeMessage"></div>
+    
+    <div class="user-info">
+      <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+      <p><strong>Tipo:</strong> <span id="userType"></span></p>
+      <div id="additionalInfo"></div>
+    </div>
+    
+    <div class="actions">
+      <a href="/logout" class="logout-btn">Sair</a>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Busca os dados do usuário logado
+      fetch('/user-data')
+        .then(response => response.json())
+        .then(user => {
+          const welcomeMessage = document.getElementById('welcomeMessage');
+          const userEmail = document.getElementById('userEmail');
+          const userType = document.getElementById('userType');
+          const additionalInfo = document.getElementById('additionalInfo');
+          
+          userEmail.textContent = user.email;
+          userType.textContent = user.tipo;
+          
+          // Mensagem personalizada conforme o tipo de usuário
+          if (user.tipo === 'professor') {
+            welcomeMessage.textContent = `Prazer, Professor ${user.nome}`;
+            additionalInfo.innerHTML = `
+              <p><strong>Departamento:</strong> ${user.departamento || 'Não informado'}</p>
+              <p><strong>Instituição:</strong> ${user.instituicao || 'Não informada'}</p>
+            `;
+          } else if (user.tipo === 'aluno') {
+            welcomeMessage.textContent = `Bem-vindo, ${user.nome}`;
+            additionalInfo.innerHTML = `
+              <p><strong>Curso:</strong> ${user.curso || 'Não informado'}</p>
+              <p><strong>Instituição:</strong> ${user.instituicao || 'Não informada'}</p>
+              <p><strong>Saldo:</strong> ${user.saldo !== undefined ? user.saldo + ' moedas' : 'Não informado'}</p>
+            `;
+          } else if (user.tipo === 'empresa') {
+            welcomeMessage.textContent = `${user.nome} adora a Dona Sara`;
+            additionalInfo.innerHTML = `
+              <p><strong>CNPJ:</strong> ${user.cnpj || 'Não informado'}</p>
+              <p><strong>Endereço:</strong> ${user.endereco || 'Não informado'}</p>
+              ${user.descricao ? `<p><strong>Descrição:</strong> ${user.descricao}</p>` : ''}
+            `;
+          }
+        })
+        .catch(error => {
+          console.error('Erro ao carregar dados do usuário:', error);
+          window.location.href = '/login';
+        });
+    });
+  </script>
+</body>
+</html>
