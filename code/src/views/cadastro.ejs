@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --danger: #dc3545;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    
+    .container {
+      width: 100%;
+      max-width: 800px;
+      background: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    
+    h1 {
+      color: var(--primary);
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input, select, textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 0.75rem center;
+      background-size: 1rem;
+    }
+    
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+      width: 100%;
+    }
+    
+    .btn:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .form-section {
+      display: none;
+    }
+    
+    .form-section.active {
+      display: block;
+    }
+    
+    .error-message {
+      color: var(--danger);
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      display: none;
+    }
+    
+    .required:after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cadastro</h1>
+    
+    <form id="cadastroForm">
+      <div class="form-group">
+        <label for="tipoUsuario" class="required">Tipo de Usuário</label>
+        <select id="tipoUsuario" name="tipoUsuario" required>
+          <option value="">Selecione um tipo</option>
+          <option value="aluno">Aluno</option>
+          <option value="professor">Professor</option>
+          <option value="empresa">Empresa</option>
+        </select>
+        <div class="error-message" id="tipoUsuarioError">Por favor, selecione um tipo de usuário</div>
+      </div>
+      
+      <!-- Campos comuns a todos os usuários -->
+      <div class="form-group">
+        <label for="nome" class="required">Nome</label>
+        <input type="text" id="nome" name="nome" required>
+        <div class="error-message" id="nomeError">Por favor, informe seu nome</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="email" class="required">E-mail</label>
+        <input type="email" id="email" name="email" required>
+        <div class="error-message" id="emailError">Por favor, informe um e-mail válido</div>
+      </div>
+      
+      <div class="form-group">
+        <label for="senha" class="required">Senha</label>
+        <input type="password" id="senha" name="senha" required minlength="6">
+        <div class="error-message" id="senhaError">A senha deve ter pelo menos 6 caracteres</div>
+      </div>
+      
+      <!-- Seção específica para Aluno -->
+      <div id="alunoSection" class="form-section">
+        <div class="form-group">
+          <label for="cpfAluno" class="required">CPF</label>
+          <input type="text" id="cpfAluno" name="cpfAluno" placeholder="000.000.000-00">
+          <div class="error-message" id="cpfAlunoError">Por favor, informe um CPF válido</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="rgAluno" class="required">RG</label>
+          <input type="text" id="rgAluno" name="rgAluno">
+          <div class="error-message" id="rgAlunoError">Por favor, informe um RG válido</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="enderecoAluno" class="required">Endereço</label>
+          <input type="text" id="enderecoAluno" name="enderecoAluno">
+          <div class="error-message" id="enderecoAlunoError">Por favor, informe seu endereço</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="cursoAluno" class="required">Curso</label>
+          <input type="text" id="cursoAluno" name="cursoAluno">
+          <div class="error-message" id="cursoAlunoError">Por favor, informe seu curso</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="instituicaoAluno" class="required">Instituição de Ensino</label>
+          <select id="instituicaoAluno" name="instituicaoAluno">
+            <option value="">Selecione uma instituição</option>
+            <!-- As opções serão carregadas via JavaScript -->
+          </select>
+          <div class="error-message" id="instituicaoAlunoError">Por favor, selecione uma instituição</div>
+        </div>
+      </div>
+      
+      <!-- Seção específica para Professor -->
+      <div id="professorSection" class="form-section">
+        <div class="form-group">
+          <label for="cpfProfessor" class="required">CPF</label>
+          <input type="text" id="cpfProfessor" name="cpfProfessor" placeholder="000.000.000-00">
+          <div class="error-message" id="cpfProfessorError">Por favor, informe um CPF válido</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="departamentoProfessor" class="required">Departamento</label>
+          <input type="text" id="departamentoProfessor" name="departamentoProfessor">
+          <div class="error-message" id="departamentoProfessorError">Por favor, informe seu departamento</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="instituicaoProfessor" class="required">Instituição de Ensino</label>
+          <select id="instituicaoProfessor" name="instituicaoProfessor">
+            <option value="">Selecione uma instituição</option>
+            <!-- As opções serão carregadas via JavaScript -->
+          </select>
+          <div class="error-message" id="instituicaoProfessorError">Por favor, selecione uma instituição</div>
+        </div>
+      </div>
+      
+      <!-- Seção específica para Empresa -->
+      <div id="empresaSection" class="form-section">
+        <div class="form-group">
+          <label for="cnpjEmpresa" class="required">CNPJ</label>
+          <input type="text" id="cnpjEmpresa" name="cnpjEmpresa" placeholder="00.000.000/0000-00">
+          <div class="error-message" id="cnpjEmpresaError">Por favor, informe um CNPJ válido</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="enderecoEmpresa" class="required">Endereço</label>
+          <input type="text" id="enderecoEmpresa" name="enderecoEmpresa">
+          <div class="error-message" id="enderecoEmpresaError">Por favor, informe o endereço da empresa</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="telefoneEmpresa">Telefone</label>
+          <input type="text" id="telefoneEmpresa" name="telefoneEmpresa" placeholder="(00) 00000-0000">
+          <div class="error-message" id="telefoneEmpresaError">Por favor, informe um telefone válido</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="descricaoEmpresa">Descrição</label>
+          <textarea id="descricaoEmpresa" name="descricaoEmpresa" rows="3"></textarea>
+        </div>
+      </div>
+      
+      <button type="submit" class="btn">Cadastrar</button>
+    </form>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const tipoUsuarioSelect = document.getElementById('tipoUsuario');
+      const alunoSection = document.getElementById('alunoSection');
+      const professorSection = document.getElementById('professorSection');
+      const empresaSection = document.getElementById('empresaSection');
+      const form = document.getElementById('cadastroForm');
+      
+      // Carrega as instituições de ensino
+      fetch('/instituicoes')
+        .then(response => response.json())
+        .then(instituicoes => {
+          const instituicaoAluno = document.getElementById('instituicaoAluno');
+          const instituicaoProfessor = document.getElementById('instituicaoProfessor');
+          
+          instituicoes.forEach(instituicao => {
+            const option = document.createElement('option');
+            option.value = instituicao.id;
+            option.textContent = instituicao.nome;
+            
+            if (instituicaoAluno) instituicaoAluno.appendChild(option.cloneNode(true));
+            if (instituicaoProfessor) instituicaoProfessor.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Erro ao carregar instituições:', error));
+      
+      // Mostra/oculta seções conforme o tipo de usuário selecionado
+      tipoUsuarioSelect.addEventListener('change', function() {
+        alunoSection.classList.remove('active');
+        professorSection.classList.remove('active');
+        empresaSection.classList.remove('active');
+        
+        const tipo = this.value;
+        if (tipo === 'aluno') {
+          alunoSection.classList.add('active');
+        } else if (tipo === 'professor') {
+          professorSection.classList.add('active');
+        } else if (tipo === 'empresa') {
+          empresaSection.classList.add('active');
+        }
+      });
+      
+      // Validação do formulário
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Valida campos comuns
+        const tipoUsuario = tipoUsuarioSelect.value;
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const senha = document.getElementById('senha').value;
+        
+        let isValid = true;
+        
+        // Valida campos comuns
+        if (!tipoUsuario) {
+          document.getElementById('tipoUsuarioError').style.display = 'block';
+          isValid = false;
+        } else {
+          document.getElementById('tipoUsuarioError').style.display = 'none';
+        }
+        
+        if (!nome) {
+          document.getElementById('nomeError').style.display = 'block';
+          isValid = false;
+        } else {
+          document.getElementById('nomeError').style.display = 'none';
+        }
+        
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          document.getElementById('emailError').style.display = 'block';
+          isValid = false;
+        } else {
+          document.getElementById('emailError').style.display = 'none';
+        }
+        
+        if (!senha || senha.length < 6) {
+          document.getElementById('senhaError').style.display = 'block';
+          isValid = false;
+        } else {
+          document.getElementById('senhaError').style.display = 'none';
+        }
+        
+        // Valida campos específicos
+        if (tipoUsuario === 'aluno') {
+          const cpf = document.getElementById('cpfAluno').value;
+          const rg = document.getElementById('rgAluno').value;
+          const endereco = document.getElementById('enderecoAluno').value;
+          const curso = document.getElementById('cursoAluno').value;
+          const instituicao = document.getElementById('instituicaoAluno').value;
+          
+          if (!cpf || cpf.replace(/\D/g, '').length !== 11) {
+            document.getElementById('cpfAlunoError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('cpfAlunoError').style.display = 'none';
+          }
+          
+          if (!rg) {
+            document.getElementById('rgAlunoError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('rgAlunoError').style.display = 'none';
+          }
+          
+          if (!endereco) {
+            document.getElementById('enderecoAlunoError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('enderecoAlunoError').style.display = 'none';
+          }
+          
+          if (!curso) {
+            document.getElementById('cursoAlunoError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('cursoAlunoError').style.display = 'none';
+          }
+          
+          if (!instituicao) {
+            document.getElementById('instituicaoAlunoError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('instituicaoAlunoError').style.display = 'none';
+          }
+        } else if (tipoUsuario === 'professor') {
+          const cpf = document.getElementById('cpfProfessor').value;
+          const departamento = document.getElementById('departamentoProfessor').value;
+          const instituicao = document.getElementById('instituicaoProfessor').value;
+          
+          if (!cpf || cpf.replace(/\D/g, '').length !== 11) {
+            document.getElementById('cpfProfessorError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('cpfProfessorError').style.display = 'none';
+          }
+          
+          if (!departamento) {
+            document.getElementById('departamentoProfessorError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('departamentoProfessorError').style.display = 'none';
+          }
+          
+          if (!instituicao) {
+            document.getElementById('instituicaoProfessorError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('instituicaoProfessorError').style.display = 'none';
+          }
+        } else if (tipoUsuario === 'empresa') {
+          const cnpj = document.getElementById('cnpjEmpresa').value;
+          const endereco = document.getElementById('enderecoEmpresa').value;
+          
+          if (!cnpj || cnpj.replace(/\D/g, '').length !== 14) {
+            document.getElementById('cnpjEmpresaError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('cnpjEmpresaError').style.display = 'none';
+          }
+          
+          if (!endereco) {
+            document.getElementById('enderecoEmpresaError').style.display = 'block';
+            isValid = false;
+          } else {
+            document.getElementById('enderecoEmpresaError').style.display = 'none';
+          }
+        }
+        
+        if (!isValid) return;
+        
+        // Prepara os dados para envio
+        const formData = {
+          nome,
+          email,
+          senha,
+          tipo: tipoUsuario
+        };
+        
+        if (tipoUsuario === 'aluno') {
+          formData.cpf = document.getElementById('cpfAluno').value.replace(/\D/g, '');
+          formData.rg = document.getElementById('rgAluno').value.replace(/\D/g, '');
+          formData.endereco = document.getElementById('enderecoAluno').value;
+          formData.curso = document.getElementById('cursoAluno').value;
+          formData.instituicaoEnsinoId = document.getElementById('instituicaoAluno').value;
+          
+          // Envia para a rota de alunos
+          fetch('/alunos/cadastrar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.erro) {
+              alert('Erro: ' + data.erro);
+            } else {
+              alert('Aluno cadastrado com sucesso!');
+              form.reset();
+            }
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao cadastrar o aluno');
+          });
+          
+        } else if (tipoUsuario === 'professor') {
+          formData.cpf = document.getElementById('cpfProfessor').value.replace(/\D/g, '');
+          formData.departamento = document.getElementById('departamentoProfessor').value;
+          formData.instituicaoEnsinoId = document.getElementById('instituicaoProfessor').value;
+          
+          // Envia para a rota de professores
+          fetch('/professores/cadastrar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.erro) {
+              alert('Erro: ' + data.erro);
+            } else {
+              alert('Professor cadastrado com sucesso!');
+              form.reset();
+            }
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao cadastrar o professor');
+          });
+          
+        } else if (tipoUsuario === 'empresa') {
+          formData.cnpj = document.getElementById('cnpjEmpresa').value.replace(/\D/g, '');
+          formData.endereco = document.getElementById('enderecoEmpresa').value;
+          formData.telefone = document.getElementById('telefoneEmpresa').value;
+          formData.descricao = document.getElementById('descricaoEmpresa').value;
+          
+          // Envia para a rota de empresas
+          fetch('/empresas/cadastrar', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.erro) {
+              alert('Erro: ' + data.erro);
+            } else {
+              alert('Empresa cadastrada com sucesso!');
+              form.reset();
+            }
+          })
+          .catch(error => {
+            console.error('Erro:', error);
+            alert('Ocorreu um erro ao cadastrar a empresa');
+          });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
