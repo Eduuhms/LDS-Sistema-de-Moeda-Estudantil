@@ -32,7 +32,7 @@ app.get('/', (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
   }
-  res.render('dashboard');
+  res.render('telaInicial');
 });
 
 // Rota página de cadastro
