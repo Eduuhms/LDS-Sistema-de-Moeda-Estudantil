@@ -136,7 +136,7 @@ app.get('/logout', (req, res) => {
 // Rota de login (página)
 app.get('/login', (req, res) => {
   if (req.session.userId) {
-    return res.redirect('/dashboard');
+    return res.redirect('/');
   }
   res.render('login');
 });
