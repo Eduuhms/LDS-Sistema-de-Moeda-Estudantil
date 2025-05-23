@@ -29,7 +29,10 @@ app.set('view engine', 'ejs');
 
 // Rota página inicial
 app.get('/', (req, res) => {
-  res.render('index');
+  if (!req.session.userId) {
+    return res.redirect('/login');
+  }
+  res.render('dashboard');
 });
 
 // Rota página de cadastro
@@ -122,14 +125,6 @@ app.get('/user-data', async (req, res) => {
     console.error('Erro ao buscar dados do usuário:', error);
     res.status(500).json({ erro: 'Erro ao buscar dados do usuário' });
   }
-});
-
-// Rota do dashboard
-app.get('/dashboard', (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
-  res.render('dashboard');
 });
 
 // Rota de logout
