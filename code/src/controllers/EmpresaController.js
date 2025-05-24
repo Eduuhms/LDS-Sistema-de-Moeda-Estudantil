@@ -140,6 +140,35 @@ class EmpresaController {
       });
     }
   }
+
+  // Busca a empresa do usuário logado
+  static async buscarPorUsuario(req, res) {
+    try {
+      if (!req.session.userId) {
+        return res.status(401).json({ erro: 'Usuário não autenticado' });
+      }
+      
+      const empresa = await EmpresaModel.buscarPorUsuarioId(req.session.userId);
+      
+      if (!empresa) {
+        return res.status(404).json({ erro: 'Empresa não encontrada para este usuário' });
+      }
+      
+      return res.status(200).json({
+        id: empresa.id,
+        usuario_id: empresa.usuario_id,
+        cnpj: empresa.cnpj,
+        endereco: empresa.endereco,
+        telefone: empresa.telefone,
+        descricao: empresa.descricao
+      });
+    } catch (error) {
+      console.error('Erro ao buscar empresa do usuário:', error);
+      return res.status(500).json({ 
+        erro: 'Falha ao buscar empresa. Por favor, tente novamente mais tarde.' 
+      });
+    }
+  }
   
   // Atualiza uma empresa
   static async atualizar(req, res) {

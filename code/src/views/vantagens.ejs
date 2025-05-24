@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gerenciar Vantagens - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --white: #ffffff;
+      --border: #e9ecef;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--white);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+      z-index: 1001;
+    }
+
+    .dropdown-content a {
+      color: var(--dark);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown.show .dropdown-content {
+      display: block;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .user-avatar:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .page-title {
+      font-size: 2rem;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+    }
+
+    .btn-warning {
+      background-color: var(--warning);
+      color: var(--dark);
+    }
+
+    .btn-warning:hover {
+      background-color: #e0a800;
+    }
+
+    .btn-danger {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .btn-danger:hover {
+      background-color: #c82333;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* Vantagens Grid */
+    .vantagens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .vantagem-card {
+      background: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .vantagem-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .vantagem-image {
+      width: 100%;
+      height: 200px;
+      background-color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: var(--primary);
+    }
+
+    .vantagem-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .vantagem-content {
+      padding: 1.5rem;
+    }
+
+    .vantagem-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--dark);
+      margin-bottom: 0.5rem;
+    }
+
+    .vantagem-description {
+      color: #6c757d;
+      margin-bottom: 1rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .vantagem-price {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--success);
+      margin-bottom: 1rem;
+    }
+
+    .vantagem-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      margin: 5% auto;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      color: var(--primary);
+      margin: 0;
+    }
+
+    .close {
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+
+    .close:hover {
+      color: var(--dark);
+    }
+
+    /* Form */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--primary);
+    }
+
+    .spinner {
+      border: 4px solid var(--light);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+      
+      .vantagens-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .vantagem-actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
+      <div class="navbar-menu">
+        <a href="/" class="navbar-link">Início</a>
+        <a href="/vantagens" class="navbar-link">Vantagens</a>
+        <div class="dropdown">
+          <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">E</div>
+          <div class="dropdown-content" id="dropdownContent">
+            <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
+            <a href="/logout">Sair</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Gerenciar Vantagens</h1>
+      <button class="btn btn-primary" onclick="openVantagemModal()">
+        + Nova Vantagem
+      </button>
+    </div>
+
+    <!-- Alerts -->
+    <div id="alertSuccess" class="alert alert-success">
+      <span id="alertSuccessMessage"></span>
+    </div>
+    <div id="alertError" class="alert alert-danger">
+      <span id="alertErrorMessage"></span>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Carregando vantagens...</p>
+    </div>
+
+    <!-- Vantagens Grid -->
+    <div id="vantagensGrid" class="vantagens-grid" style="display: none;">
+      <!-- Vantagens serão inseridas aqui dinamicamente -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" style="display: none; text-align: center; padding: 4rem 2rem;">
+      <h3>Nenhuma vantagem cadastrada</h3>
+      <p>Comece criando sua primeira vantagem para os estudantes!</p>
+      <button class="btn btn-primary" onclick="openVantagemModal()">
+        Criar Primeira Vantagem
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Vantagem -->
+  <div id="vantagemModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modalTitle">Nova Vantagem</h2>
+        <button class="close" onclick="closeVantagemModal()">&times;</button>
+      </div>
+      
+      <form id="vantagemForm">
+        <input type="hidden" id="vantagemId">
+        
+        <div class="form-group">
+          <label class="form-label" for="nome">Nome da Vantagem</label>
+          <input type="text" id="nome" class="form-control" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="descricao">Descrição</label>
+          <textarea id="descricao" class="form-control" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="foto">URL da Foto</label>
+          <input type="url" id="foto" class="form-control" required placeholder="https://exemplo.com/imagem.jpg">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="custoMoedas">Custo em Moedas</label>
+          <input type="number" id="custoMoedas" class="form-control" min="1" required>
+        </div>
+        
+        <div class="form-group">
+          <button type="submit" class="btn btn-success" id="submitBtn">
+            Salvar Vantagem
+          </button>
+          <button type="button" class="btn btn-secondary" onclick="closeVantagemModal()">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal de Informações da Conta -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Informações da Conta</h2>
+        <button class="close" onclick="closeAccountModal()">&times;</button>
+      </div>
+      <div id="accountInfo">
+        <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+        <p><strong>Tipo:</strong> <span id="userType"></span></p>
+        <div id="additionalInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let currentVantagem = null;
+    let empresaId = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserData();
+      loadVantagens();
+    });
+
+    // Carrega dados do usuário
+    async function loadUserData() {
+      try {
+        const response = await fetch('/user-data');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar dados do usuário');
+        }
+        
+        currentUser = await response.json();
+        
+        // Atualiza UI com dados do usuário
+        const userAvatar = document.getElementById('userAvatar');
+        if (currentUser.nome) {
+          userAvatar.textContent = currentUser.nome.charAt(0).toUpperCase();
+        }
+        
+        // Busca o ID da empresa
+        const empresaResponse = await fetch('/empresas/usuario');
+        if (empresaResponse.ok) {
+          const empresaData = await empresaResponse.json();
+          empresaId = empresaData.id;
+        }
+        
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        window.location.href = '/login';
+      }
+    }
+
+    // Carrega vantagens
+    async function loadVantagens() {
+      const loading = document.getElementById('loading');
+      const grid = document.getElementById('vantagensGrid');
+      const emptyState = document.getElementById('emptyState');
+      
+      try {
+        loading.style.display = 'block';
+        grid.style.display = 'none';
+        emptyState.style.display = 'none';
+        
+        const response = await fetch('/vantagens/listar');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar vantagens');
+        }
+        
+        const vantagens = await response.json();
+        
+        loading.style.display = 'none';
+        
+        if (vantagens.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          grid.style.display = 'grid';
+          renderVantagens(vantagens);
+        }
+        
+      } catch (error) {
+        console.error('Erro ao carregar vantagens:', error);
+        loading.style.display = 'none';
+        showAlert('Erro ao carregar vantagens', 'danger');
+      }
+    }
+
+    // Renderiza vantagens no grid
+    function renderVantagens(vantagens) {
+      const grid = document.getElementById('vantagensGrid');
+      grid.innerHTML = '';
+      
+      vantagens.forEach(vantagem => {
+        const card = document.createElement('div');
+        card.className = 'vantagem-card';
+        card.innerHTML = `
+          <div class="vantagem-image">
+            ${vantagem.foto ? `<img src="${vantagem.foto}" alt="${vantagem.nome}" onerror="this.parentElement.innerHTML='🎁'">` : '🎁'}
+          </div>
+          <div class="vantagem-content">
+            <h3 class="vantagem-title">${vantagem.nome}</h3>
+            <p class="vantagem-description">${vantagem.descricao}</p>
+            <div class="vantagem-price">${vantagem.custo_moedas} moedas</div>
+            <div class="vantagem-actions">
+              <button class="btn btn-warning btn-sm" onclick="editVantagem(${vantagem.id})">
+                Editar
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="deleteVantagem(${vantagem.id})">
+                Excluir
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Abre modal de vantagem
+    function openVantagemModal(vantagem = null) {
+      const modal = document.getElementById('vantagemModal');
+      const title = document.getElementById('modalTitle');
+      const form = document.getElementById('vantagemForm');
+      
+      currentVantagem = vantagem;
+      
+      if (vantagem) {
+        title.textContent = 'Editar Vantagem';
+        document.getElementById('vantagemId').value = vantagem.id;
+        document.getElementById('nome').value = vantagem.nome;
+        document.getElementById('descricao').value = vantagem.descricao;
+        document.getElementById('foto').value = vantagem.foto;
+        document.getElementById('custoMoedas').value = vantagem.custo_moedas;
+      } else {
+        title.textContent = 'Nova Vantagem';
+        form.reset();
+        document.getElementById('vantagemId').value = '';
+      }
+      
+      modal.style.display = 'block';
+    }
+
+    // Fecha modal de vantagem
+    function closeVantagemModal() {
+      document.getElementById('vantagemModal').style.display = 'none';
+      currentVantagem = null;
+    }
+
+    // Edita vantagem
+    async function editVantagem(id) {
+      try {
+        const response = await fetch(`/vantagens/buscar/${id}`);
+        
+        if (!response.ok) {
+          throw new Error('Erro ao buscar vantagem');
+        }
+        
+        const vantagem = await response.json();
+        openVantagemModal(vantagem);
+        
+      } catch (error) {
+        console.error('Erro ao buscar vantagem:', error);
+        showAlert('Erro ao carregar dados da vantagem', 'danger');
+      }
+    }
+
+    // Deleta vantagem
+    async function deleteVantagem(id) {
+      if (!confirm('Tem certeza que deseja excluir esta vantagem?')) {
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/vantagens/deletar/${id}`, {
+          method: 'DELETE'
+        });
+        
+        if (!response.ok) {
+          throw new Error('Erro ao excluir vantagem');
+        }
+        
+        showAlert('Vantagem excluída com sucesso!', 'success');
+        loadVantagens();
+        
+      } catch (error) {
+        console.error('Erro ao excluir vantagem:', error);
+        showAlert('Erro ao excluir vantagem', 'danger');
+      }
+    }
+
+    // Submit do formulário
+    document.getElementById('vantagemForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const originalText = submitBtn.textContent;
+      
+      try {
+        submitBtn.textContent = 'Salvando...';
+        submitBtn.disabled = true;
+        
+        const formData = {
+          nome: document.getElementById('nome').value,
+          descricao: document.getElementById('descricao').value,
+          foto: document.getElementById('foto').value,
+          custoMoedas: parseInt(document.getElementById('custoMoedas').value),
+          empresaId: empresaId
+        };
+        
+        const isEdit = currentVantagem !== null;
+        const url = isEdit ? `/vantagens/atualizar/${currentVantagem.id}` : '/vantagens/cadastrar';
+        const method = isEdit ? 'PUT' : 'POST';
+        
+        const response = await fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(formData)
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.erro || 'Erro ao salvar vantagem');
+        }
+        
+        const message = isEdit ? 'Vantagem atualizada com sucesso!' : 'Vantagem cadastrada com sucesso!';
+        showAlert(message, 'success');
+        
+        closeVantagemModal();
+        loadVantagens();
+        
+      } catch (error) {
+        console.error('Erro ao salvar vantagem:', error);
+        showAlert(error.message, 'danger');
+      } finally {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      }
+    });
+
+    // Funções do dropdown
+    function toggleDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function closeDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.remove('show');
+    }
+
+    // Modal de conta
+    function openAccountModal() {
+      if (currentUser) {
+        const userEmail = document.getElementById('userEmail');
+        const userType = document.getElementById('userType');
+        const additionalInfo = document.getElementById('additionalInfo');
+        
+        userEmail.textContent = currentUser.email;
+        userType.textContent = currentUser.tipo;
+        
+        if (currentUser.tipo === 'empresa') {
+          additionalInfo.innerHTML = `
+            <p><strong>CNPJ:</strong> ${currentUser.cnpj || 'Não informado'}</p>
+            <p><strong>Endereço:</strong> ${currentUser.endereco || 'Não informado'}</p>
+            ${currentUser.descricao ? `<p><strong>Descrição:</strong> ${currentUser.descricao}</p>` : ''}
+          `;
+        }
+      }
+      
+      document.getElementById('accountModal').style.display = 'block';
+    }
+
+    function closeAccountModal() {
+      document.getElementById('accountModal').style.display = 'none';
+    }
+
+    // Mostra alert
+    function showAlert(message, type) {
+      const alertId = type === 'success' ? 'alertSuccess' : 'alertError';
+      const messageId = type === 'success' ? 'alertSuccessMessage' : 'alertErrorMessage';
+      
+      document.getElementById(messageId).textContent = message;
+      document.getElementById(alertId).classList.add('show');
+      
+      setTimeout(() => {
+        document.getElementById(alertId).classList.remove('show');
+      }, 5000);
+    }
+
+    // Fecha modais clicando fora
+    window.onclick = function(event) {
+      const vantagemModal = document.getElementById('vantagemModal');
+      const accountModal = document.getElementById('accountModal');
+      const dropdown = document.querySelector('.dropdown');
+      
+      if (event.target === vantagemModal) {
+        closeVantagemModal();
+      } else if (event.target === accountModal) {
+        closeAccountModal();
+      } else if (!dropdown.contains(event.target)) {
+        closeDropdown();
+      }
+    }
+
+    // Fecha dropdown quando clica fora dele
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.dropdown');
+      
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html> 

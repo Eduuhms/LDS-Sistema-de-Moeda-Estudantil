@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard - Sistema de Moeda Estudantil</title>
+  <title>Tela Inicial - Sistema de Moeda Estudantil</title>
   <style>
     :root {
       --primary: #4361ee;
@@ -11,6 +11,10 @@
       --light: #f8f9fa;
       --dark: #212529;
       --success: #28a745;
+      --warning: #ffc107;
+      --info: #17a2b8;
+      --white: #ffffff;
+      --border: #e9ecef;
     }
     
     * {
@@ -25,133 +29,520 @@
       color: var(--dark);
       background-color: var(--light);
       min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
     }
-    
-    .container {
-      width: 100%;
-      max-width: 800px;
-      background: white;
-      border-radius: 8px;
-      padding: 2rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    }
-    
-    h1 {
-      color: var(--primary);
-      margin-bottom: 1.5rem;
-      text-align: center;
-    }
-    
-    .welcome-message {
+
+    .navbar-brand {
       font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .navbar-item {
+      position: relative;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--white);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+      z-index: 1001;
+    }
+
+    .dropdown-content a {
+      color: var(--dark);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown.show .dropdown-content {
+      display: block;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .user-avatar:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .welcome-section {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      padding: 3rem 2rem;
+      border-radius: 12px;
       margin-bottom: 2rem;
       text-align: center;
-      color: var(--success);
     }
-    
-    .user-info {
+
+    .welcome-title {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
       margin-bottom: 2rem;
-      padding: 1rem;
-      background-color: #f8f9fa;
-      border-radius: 4px;
     }
-    
-    .logout-btn {
+
+    .card {
+      background: var(--white);
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      border: 1px solid var(--border);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .card-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .card-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--dark);
+    }
+
+    .card-content {
+      color: #6c757d;
+    }
+
+    .btn {
       display: inline-block;
       padding: 0.75rem 1.5rem;
-      background-color: var(--primary);
-      color: white;
       border: none;
-      border-radius: 4px;
+      border-radius: 6px;
       font-size: 1rem;
       font-weight: 500;
       cursor: pointer;
-      transition: background-color 0.2s;
+      transition: all 0.2s;
       text-decoration: none;
       text-align: center;
     }
-    
-    .logout-btn:hover {
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
       background-color: var(--primary-dark);
     }
-    
-    .actions {
-      margin-top: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
+
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary);
+      border: 2px solid var(--primary);
     }
-    
+
+    .btn-outline:hover {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid var(--primary);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .stat-number {
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+
+    .stat-label {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      margin: 5% auto;
+      padding: 2rem;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close:hover {
+      color: var(--dark);
+    }
+
     @media (max-width: 768px) {
-      .container {
-        padding: 1.5rem;
+      .navbar-menu {
+        gap: 1rem;
+      }
+      
+      .welcome-title {
+        font-size: 2rem;
+      }
+      
+      .dashboard-grid {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Dashboard</h1>
-    
-    <div class="welcome-message" id="welcomeMessage"></div>
-    
-    <div class="user-info">
-      <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
-      <p><strong>Tipo:</strong> <span id="userType"></span></p>
-      <div id="additionalInfo"></div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
+      <div class="navbar-menu">
+        <div class="dropdown">
+          <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">E</div>
+          <div class="dropdown-content" id="dropdownContent">
+            <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
+            <a href="/logout">Sair</a>
+          </div>
+        </div>
+      </div>
     </div>
-    
-    <div class="actions">
-      <a href="/logout" class="logout-btn">Sair</a>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+      <h1 class="welcome-title" id="welcomeTitle">Bem-vindo!</h1>
+    </div>
+
+    <div class="dashboard-grid" id="opcoesEmpresa">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background-color: var(--success); color: white;">🎁</div>
+          <div class="card-title">Gerenciar Vantagens</div>
+        </div>
+        <div class="card-content">
+          <p>Crie, edite e gerencie as vantagens oferecidas aos estudantes.</p>
+          <br>
+          <a href="/vantagens" class="btn btn-primary">Acessar Vantagens</a>
+        </div>
+      </div>
+      <!-- <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background-color: var(--warning); color: white;">👥</div>
+          <div class="card-title">Estudantes</div>
+        </div> -->
+        <!-- <div class="card-content">
+          <p>Veja quais estudantes estão interagindo com suas vantagens.</p>
+          <br>
+          <a href="/estudantes" class="btn btn-outline">Ver Estudantes</a>
+        </div>
+      </div> -->
+    </div>
+    <div class="dashboard-grid" id="opcoesAluno">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background-color: var(--success); color: white;">🎁</div>
+          <div class="card-title">Consultar Vantagens</div>
+        </div>
+        <div class="card-content">
+          <p>Crie, edite e gerencie as vantagens oferecidas aos estudantes.</p>
+          <br>
+          <a href="/vantagens" class="btn btn-primary">Acessar Vantagens</a>
+        </div>
+      </div>
+    </div>
+    <div class="dashboard-grid" id="opcoesProfessor">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background-color: var(--success); color: white;">🎁</div>
+          <div class="card-title">A decidir</div>
+        </div>
+        <div class="card-content">
+          <p>Crie, edite e gerencie as vantagens oferecidas aos estudantes.</p>
+          <br>
+          <a href="/vantagens" class="btn btn-primary">Acessar Vantagens</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Informações da Conta -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeAccountModal()">&times;</span>
+      <h2>Informações da Conta</h2>
+      <div id="accountInfo">
+        <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+        <p><strong>Tipo:</strong> <span id="userType"></span></p>
+        <div id="additionalInfo"></div>
+      </div>
     </div>
   </div>
 
   <script>
+    let currentUser = null;
+
     document.addEventListener('DOMContentLoaded', function() {
+      console.log('Página carregada, buscando dados do usuário...');
+      
       // Busca os dados do usuário logado
       fetch('/user-data')
-        .then(response => response.json())
-        .then(user => {
-          const welcomeMessage = document.getElementById('welcomeMessage');
-          const userEmail = document.getElementById('userEmail');
-          const userType = document.getElementById('userType');
-          const additionalInfo = document.getElementById('additionalInfo');
+        .then(response => {
+          console.log('Resposta recebida:', response.status);
           
-          userEmail.textContent = user.email;
-          userType.textContent = user.tipo;
-          
-          // Mensagem personalizada conforme o tipo de usuário
-          if (user.tipo === 'professor') {
-            welcomeMessage.textContent = `Prazer, Professor ${user.nome}`;
-            additionalInfo.innerHTML = `
-              <p><strong>Departamento:</strong> ${user.departamento || 'Não informado'}</p>
-              <p><strong>Instituição:</strong> ${user.instituicao || 'Não informada'}</p>
-            `;
-          } else if (user.tipo === 'aluno') {
-            welcomeMessage.textContent = `Bem-vindo, ${user.nome}`;
-            additionalInfo.innerHTML = `
-              <p><strong>Curso:</strong> ${user.curso || 'Não informado'}</p>
-              <p><strong>Instituição:</strong> ${user.instituicao || 'Não informada'}</p>
-              <p><strong>Saldo:</strong> ${user.saldo !== undefined ? user.saldo + ' moedas' : 'Não informado'}</p>
-            `;
-          } else if (user.tipo === 'empresa') {
-            welcomeMessage.textContent = `${user.nome} adora a Dona Sara`;
-            additionalInfo.innerHTML = `
-              <p><strong>CNPJ:</strong> ${user.cnpj || 'Não informado'}</p>
-              <p><strong>Endereço:</strong> ${user.endereco || 'Não informado'}</p>
-              ${user.descricao ? `<p><strong>Descrição:</strong> ${user.descricao}</p>` : ''}
-            `;
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
+          
+          return response.json();
+        })
+        .then(user => {
+          console.log('Dados do usuário recebidos:', user);
+          currentUser = user;
+          updateUIWithUserData(user);
+          console.log('Dados do usuário atualizados com sucesso');
+          opcoesTelaInicial();
         })
         .catch(error => {
           console.error('Erro ao carregar dados do usuário:', error);
-          window.location.href = '/login';
+          
+          // Só redireciona se for erro de autenticação (401)
+          if (error.message.includes('401')) {
+            console.log('Usuário não autenticado, redirecionando para login...');
+            setTimeout(() => {
+              window.location.href = '/login';
+            }, 1000); // Adiciona um delay de 1 segundo
+          } else {
+            // Para outros erros, mostra uma mensagem na tela
+            const welcomeTitle = document.getElementById('welcomeTitle');
+            welcomeTitle.textContent = 'Erro ao carregar dados do usuário';
+            welcomeTitle.style.color = '#dc3545';
+          }
         });
     });
+
+    function updateUIWithUserData(user) {
+      const welcomeTitle = document.getElementById('welcomeTitle');
+      const userAvatar = document.getElementById('userAvatar');
+      
+      // Atualiza avatar com primeira letra do nome
+      if (user.nome) {
+        userAvatar.textContent = user.nome.charAt(0).toUpperCase();
+      }
+      
+      // Mensagem personalizada conforme o tipo de usuário
+      if (user.tipo === 'empresa') {
+        welcomeTitle.textContent = `Bem-vinda, ${user.nome}!`;
+      } else if (user.tipo === 'professor') {
+        welcomeTitle.textContent = `Prazer, Professor ${user.nome}`;
+      } else if (user.tipo === 'aluno') {
+        welcomeTitle.textContent = `Bem-vindo, ${user.nome}`;
+      } else {
+        welcomeTitle.textContent = `Bem-vindo, ${user.nome || 'Usuário'}!`;
+      }
+    }
+
+    // Funções para controlar o dropdown
+    function toggleDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function closeDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.remove('show');
+    }
+
+    // Fecha dropdown quando clica fora dele
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.dropdown');
+      const userAvatar = document.getElementById('userAvatar');
+      
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+
+    function openAccountModal() {
+      if (currentUser) {
+        const userEmail = document.getElementById('userEmail');
+        const userType = document.getElementById('userType');
+        const additionalInfo = document.getElementById('additionalInfo');
+        
+        userEmail.textContent = currentUser.email;
+        userType.textContent = currentUser.tipo;
+        
+        // Informações específicas do tipo de usuário
+        if (currentUser.tipo === 'empresa') {
+          additionalInfo.innerHTML = `
+            <p><strong>CNPJ:</strong> ${currentUser.cnpj || 'Não informado'}</p>
+            <p><strong>Endereço:</strong> ${currentUser.endereco || 'Não informado'}</p>
+            ${currentUser.descricao ? `<p><strong>Descrição:</strong> ${currentUser.descricao}</p>` : ''}
+          `;
+        } else if (currentUser.tipo === 'professor') {
+          additionalInfo.innerHTML = `
+            <p><strong>Departamento:</strong> ${currentUser.departamento || 'Não informado'}</p>
+            <p><strong>Instituição:</strong> ${currentUser.instituicao || 'Não informada'}</p>
+          `;
+        } else if (currentUser.tipo === 'aluno') {
+          additionalInfo.innerHTML = `
+            <p><strong>Curso:</strong> ${currentUser.curso || 'Não informado'}</p>
+            <p><strong>Instituição:</strong> ${currentUser.instituicao || 'Não informada'}</p>
+            <p><strong>Saldo:</strong> ${currentUser.saldo !== undefined ? currentUser.saldo + ' moedas' : 'Não informado'}</p>
+          `;
+        }
+      }
+      
+      document.getElementById('accountModal').style.display = 'block';
+    }
+
+    function closeAccountModal() {
+      document.getElementById('accountModal').style.display = 'none';
+    }
+
+    function opcoesTelaInicial(){
+      const opcoesEmpresa = document.getElementById('opcoesEmpresa');
+      const opcoesProfessor = document.getElementById('opcoesProfessor');
+      const opcoesAluno = document.getElementById('opcoesAluno');
+
+      opcoesEmpresa.style.display = 'none';
+      opcoesProfessor.style.display = 'none';
+      opcoesAluno.style.display = 'none';
+
+      if(currentUser.tipo === 'empresa'){
+        opcoesEmpresa.style.display = 'block';
+      } else if(currentUser.tipo === 'professor'){
+        opcoesProfessor.style.display = 'block';
+      } else if(currentUser.tipo === 'aluno'){
+       opcoesAluno.style.display = 'block';
+      }
+    }
+
+    // Fecha modal clicando fora dele
+    window.onclick = function(event) {
+      const modal = document.getElementById('accountModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    }
   </script>
 </body>
 </html>

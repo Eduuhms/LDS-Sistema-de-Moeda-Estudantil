@@ -141,6 +141,31 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
+// Rota para gerenciar vantagens (apenas empresas)
+app.get('/vantagens', async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+  }
+  
+  try {
+    // Verifica se o usuário é uma empresa
+    const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+    
+    if (!usuario || usuario.tipo !== 'empresa') {
+      return res.status(403).render('error', { 
+        erro: 'Acesso negado. Apenas empresas podem acessar esta página.' 
+      });
+    }
+    
+    res.render('vantagens');
+  } catch (error) {
+    console.error('Erro ao verificar usuário:', error);
+    res.status(500).render('error', { 
+      erro: 'Erro interno do servidor' 
+    });
+  }
+});
+
 // Rotas
 const alunoRoutes = require('./src/routes/alunoRoute');
 const instituicaoEnsinoRoutes = require('./src/routes/instituicaoEnsinoRoutes');
