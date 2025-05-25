@@ -150,8 +150,7 @@ app.get('/login', (req, res) => {
   res.render('login');
 });
 
-// Rota para gerenciar vantagens (apenas empresas)
-app.get('/vantagens', async (req, res) => {
+app.get('/vantagens-empresa', async (req, res) => {
   if (!req.session.userId) {
     return res.redirect('/login');
   }
@@ -166,7 +165,7 @@ app.get('/vantagens', async (req, res) => {
       });
     }
     
-    res.render('vantagens');
+    res.render('vantagens-empresa');
   } catch (error) {
     console.error('Erro ao verificar usuário:', error);
     res.status(500).render('error', { 
