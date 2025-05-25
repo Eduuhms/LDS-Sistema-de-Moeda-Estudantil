@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vantagens Disponíveis - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --white: #ffffff;
+      --border: #e9ecef;
+      --gold: #ffd700;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--white);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+      z-index: 1001;
+    }
+
+    .dropdown-content a {
+      color: var(--dark);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown.show .dropdown-content {
+      display: block;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .user-avatar:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Saldo */
+    .saldo-container {
+      background: linear-gradient(135deg, var(--gold), #ffed4e);
+      color: var(--dark);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .page-title {
+      font-size: 2.5rem;
+      color: var(--primary);
+      margin-bottom: 1rem;
+    }
+
+    .page-subtitle {
+      font-size: 1.2rem;
+      color: #6c757d;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    /* Filtros */
+    .filters-container {
+      background: var(--white);
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      margin-bottom: 2rem;
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .filter-label {
+      font-weight: 500;
+      color: var(--dark);
+    }
+
+    .filter-input {
+      padding: 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-success {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .btn-success:hover {
+      background-color: #218838;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    /* Vantagens Grid */
+    .vantagens-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 2rem;
+    }
+
+    .vantagem-card {
+      background: var(--white);
+      border-radius: 12px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .vantagem-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .vantagem-image {
+      width: 100%;
+      height: 220px;
+      background-color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: var(--primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .vantagem-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .vantagem-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--success);
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .vantagem-content {
+      padding: 1.5rem;
+    }
+
+    .vantagem-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .vantagem-description {
+      color: #6c757d;
+      margin-bottom: 1.5rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      line-height: 1.5;
+    }
+
+    .vantagem-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .vantagem-price {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--success);
+    }
+
+    .coin-icon {
+      font-size: 1.2rem;
+      color: var(--gold);
+    }
+
+    .can-afford {
+      background-color: #d4edda;
+      border-color: #c3e6cb;
+    }
+
+    .cannot-afford {
+      background-color: #f8d7da;
+      border-color: #f5c6cb;
+      opacity: 0.7;
+    }
+
+    /* Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: var(--white);
+      margin: 3% auto;
+      padding: 0;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 700px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      position: relative;
+      padding: 0;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 300px;
+      background-color: var(--light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 6rem;
+      color: var(--primary);
+    }
+
+    .modal-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .close {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: rgba(0,0,0,0.7);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 1.5rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .close:hover {
+      background: rgba(0,0,0,0.9);
+    }
+
+    .modal-body {
+      padding: 2rem;
+    }
+
+    .modal-title {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--dark);
+      margin-bottom: 1rem;
+    }
+
+    .modal-description {
+      color: #6c757d;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+      font-size: 1.1rem;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-price {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 2rem;
+      font-weight: bold;
+      color: var(--success);
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--primary);
+    }
+
+    .spinner {
+      border: 4px solid var(--light);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: #6c757d;
+    }
+
+    .empty-icon {
+      font-size: 5rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-menu {
+        gap: 1rem;
+      }
+      
+      .saldo-container {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+      }
+      
+      .page-title {
+        font-size: 2rem;
+      }
+      
+      .filters-container {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .vantagens-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-content {
+        width: 95%;
+        margin: 5% auto;
+      }
+
+      .modal-footer {
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
+      <div class="navbar-menu">
+        <a href="/" class="navbar-link">Início</a>
+        <a href="/vantagens-aluno" class="navbar-link">Vantagens</a>
+        <div class="saldo-container">
+          <span class="coin-icon">🪙</span>
+          <span id="saldoDisplay">0 moedas</span>
+        </div>
+        <div class="dropdown">
+          <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">A</div>
+          <div class="dropdown-content" id="dropdownContent">
+            <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
+            <a href="/logout">Sair</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Vantagens Disponíveis</h1>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-container">
+      <div class="filter-group">
+        <label class="filter-label" for="searchInput">Buscar:</label>
+        <input type="text" id="searchInput" class="filter-input" placeholder="Nome da vantagem..." oninput="filterVantagens()">
+      </div>
+      <div class="filter-group">
+        <label class="filter-label" for="priceFilter">Preço máximo:</label>
+        <input type="number" id="priceFilter" class="filter-input" placeholder="Máximo de moedas" min="0" oninput="filterVantagens()">
+      </div>
+      <div class="filter-group">
+        <input type="checkbox" id="affordableOnly" onchange="filterVantagens()">
+        <label class="filter-label" for="affordableOnly">Apenas que posso pagar</label>
+      </div>
+      <button class="btn btn-sm btn-primary" onclick="clearFilters()">Limpar Filtros</button>
+    </div>
+
+    <!-- Alerts -->
+    <div id="alertSuccess" class="alert alert-success">
+      <span id="alertSuccessMessage"></span>
+    </div>
+    <div id="alertError" class="alert alert-danger">
+      <span id="alertErrorMessage"></span>
+    </div>
+
+    <!-- Loading -->
+    <div id="loading" class="loading">
+      <div class="spinner"></div>
+      <p>Carregando vantagens...</p>
+    </div>
+
+    <!-- Vantagens Grid -->
+    <div id="vantagensGrid" class="vantagens-grid" style="display: none;">
+      <!-- Vantagens serão inseridas aqui dinamicamente -->
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="empty-state" style="display: none;">
+      <div class="empty-icon">🎁</div>
+      <h3>Nenhuma vantagem encontrada</h3>
+      <p>Não há vantagens disponíveis no momento ou que correspondam aos seus filtros.</p>
+    </div>
+  </div>
+
+  <!-- Modal de Detalhes da Vantagem -->
+  <div id="vantagemModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-image" id="modalImage">🎁</div>
+        <button class="close" onclick="closeVantagemModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h2 class="modal-title" id="modalTitle">Nome da Vantagem</h2>
+        <p class="modal-description" id="modalDescription">Descrição da vantagem...</p>
+        <div class="modal-footer">
+          <div class="modal-price">
+            <span class="coin-icon">🪙</span>
+            <span id="modalPrice">0 moedas</span>
+          </div>
+          <button class="btn btn-success" id="resgateBtn" onclick="resgatarVantagem()">
+            Resgatar Vantagem
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Informações da Conta -->
+  <div id="accountModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header" style="padding: 2rem; border-bottom: 1px solid var(--border);">
+        <h2 style="margin: 0; color: var(--primary);">Informações da Conta</h2>
+        <button class="close" style="position: static; background: none; color: #aaa; font-size: 28px;" onclick="closeAccountModal()">&times;</button>
+      </div>
+      <div style="padding: 2rem;" id="accountInfo">
+        <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
+        <p><strong>Tipo:</strong> <span id="userType"></span></p>
+        <div id="additionalInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let allVantagens = [];
+    let currentVantagem = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserData();
+      loadVantagens();
+    });
+
+    // Carrega dados do usuário
+    async function loadUserData() {
+      try {
+        const response = await fetch('/user-data');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar dados do usuário');
+        }
+        
+        currentUser = await response.json();
+        
+        // Atualiza UI com dados do usuário
+        const userAvatar = document.getElementById('userAvatar');
+        const saldoDisplay = document.getElementById('saldoDisplay');
+        
+        if (currentUser.nome) {
+          userAvatar.textContent = currentUser.nome.charAt(0).toUpperCase();
+        }
+        
+        if (currentUser.saldo !== undefined) {
+          saldoDisplay.textContent = `${currentUser.saldo} moedas`;
+        }
+        
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        window.location.href = '/login';
+      }
+    }
+
+    // Carrega vantagens
+    async function loadVantagens() {
+      const loading = document.getElementById('loading');
+      const grid = document.getElementById('vantagensGrid');
+      const emptyState = document.getElementById('emptyState');
+      
+      try {
+        loading.style.display = 'block';
+        grid.style.display = 'none';
+        emptyState.style.display = 'none';
+        
+        const response = await fetch('/vantagens/listar');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar vantagens');
+        }
+        
+        allVantagens = await response.json();
+        
+        loading.style.display = 'none';
+        
+        if (allVantagens.length === 0) {
+          emptyState.style.display = 'block';
+        } else {
+          grid.style.display = 'grid';
+          renderVantagens(allVantagens);
+        }
+        
+      } catch (error) {
+        console.error('Erro ao carregar vantagens:', error);
+        loading.style.display = 'none';
+        showAlert('Erro ao carregar vantagens', 'danger');
+      }
+    }
+
+    // Renderiza vantagens no grid
+    function renderVantagens(vantagens) {
+      const grid = document.getElementById('vantagensGrid');
+      grid.innerHTML = '';
+      
+      if (vantagens.length === 0) {
+        document.getElementById('emptyState').style.display = 'block';
+        grid.style.display = 'none';
+        return;
+      }
+
+      document.getElementById('emptyState').style.display = 'none';
+      grid.style.display = 'grid';
+      
+      vantagens.forEach(vantagem => {
+        const canAfford = currentUser && currentUser.saldo >= vantagem.custo_moedas;
+        const cardClass = canAfford ? 'vantagem-card can-afford' : 'vantagem-card cannot-afford';
+        
+        const card = document.createElement('div');
+        card.className = cardClass;
+        card.onclick = () => openVantagemModal(vantagem);
+        
+        card.innerHTML = `
+          <div class="vantagem-image">
+            ${vantagem.foto ? `<img src="${vantagem.foto}" alt="${vantagem.nome}" onerror="this.parentElement.innerHTML='🎁'">` : '🎁'}
+            ${canAfford ? '<div class="vantagem-badge">Você pode resgatar!</div>' : ''}
+          </div>
+          <div class="vantagem-content">
+            <h3 class="vantagem-title">${vantagem.nome}</h3>
+            <p class="vantagem-description">${vantagem.descricao}</p>
+            <div class="vantagem-footer">
+              <div class="vantagem-price">
+                <span class="coin-icon">🪙</span>
+                ${vantagem.custo_moedas}
+              </div>
+              <button class="btn btn-sm ${canAfford ? 'btn-success' : 'btn-primary'}" onclick="event.stopPropagation(); openVantagemModal(${JSON.stringify(vantagem).replace(/"/g, '&quot;')})">
+                ${canAfford ? 'Resgatar' : 'Ver Detalhes'}
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // Filtra vantagens
+    function filterVantagens() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+      const maxPrice = document.getElementById('priceFilter').value;
+      const affordableOnly = document.getElementById('affordableOnly').checked;
+      
+      let filteredVantagens = allVantagens.filter(vantagem => {
+        const matchesSearch = vantagem.nome.toLowerCase().includes(searchTerm) || 
+                             vantagem.descricao.toLowerCase().includes(searchTerm);
+        
+        const matchesPrice = !maxPrice || vantagem.custo_moedas <= parseInt(maxPrice);
+        
+        const matchesAffordable = !affordableOnly || 
+                                 (currentUser && currentUser.saldo >= vantagem.custo_moedas);
+        
+        return matchesSearch && matchesPrice && matchesAffordable;
+      });
+      
+      renderVantagens(filteredVantagens);
+    }
+
+    // Limpa filtros
+    function clearFilters() {
+      document.getElementById('searchInput').value = '';
+      document.getElementById('priceFilter').value = '';
+      document.getElementById('affordableOnly').checked = false;
+      renderVantagens(allVantagens);
+    }
+
+    // Abre modal de vantagem
+    function openVantagemModal(vantagem) {
+      currentVantagem = vantagem;
+      
+      const modal = document.getElementById('vantagemModal');
+      const modalImage = document.getElementById('modalImage');
+      const modalTitle = document.getElementById('modalTitle');
+      const modalDescription = document.getElementById('modalDescription');
+      const modalPrice = document.getElementById('modalPrice');
+      const resgateBtn = document.getElementById('resgateBtn');
+      
+      modalTitle.textContent = vantagem.nome;
+      modalDescription.textContent = vantagem.descricao;
+      modalPrice.textContent = `${vantagem.custo_moedas} moedas`;
+      
+      if (vantagem.foto) {
+        modalImage.innerHTML = `<img src="${vantagem.foto}" alt="${vantagem.nome}" onerror="this.parentElement.innerHTML='🎁'">`;
+      } else {
+        modalImage.innerHTML = '🎁';
+      }
+      
+      const canAfford = currentUser && currentUser.saldo >= vantagem.custo_moedas;
+      
+      if (canAfford) {
+        resgateBtn.textContent = 'Resgatar Vantagem';
+        resgateBtn.className = 'btn btn-success';
+        resgateBtn.disabled = false;
+      } else {
+        resgateBtn.textContent = 'Saldo Insuficiente';
+        resgateBtn.className = 'btn btn-primary';
+        resgateBtn.disabled = true;
+      }
+      
+      modal.style.display = 'block';
+    }
+
+    // Fecha modal de vantagem
+    function closeVantagemModal() {
+      document.getElementById('vantagemModal').style.display = 'none';
+      currentVantagem = null;
+    }
+
+    // Resgatar vantagem (placeholder - implementar depois)
+    function resgatarVantagem() {
+      if (!currentVantagem) return;
+      
+      if (currentUser.saldo < currentVantagem.custo_moedas) {
+        showAlert('Saldo insuficiente para resgatar esta vantagem!', 'danger');
+        return;
+      }
+      
+      // Aqui você implementaria a lógica de resgate
+      showAlert('Funcionalidade de resgate será implementada em breve!', 'danger');
+    }
+
+    // Funções do dropdown
+    function toggleDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function closeDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.remove('show');
+    }
+
+    // Modal de conta
+    function openAccountModal() {
+      if (currentUser) {
+        const userEmail = document.getElementById('userEmail');
+        const userType = document.getElementById('userType');
+        const additionalInfo = document.getElementById('additionalInfo');
+        
+        userEmail.textContent = currentUser.email;
+        userType.textContent = currentUser.tipo;
+        
+        if (currentUser.tipo === 'aluno') {
+          additionalInfo.innerHTML = `
+            <p><strong>Curso:</strong> ${currentUser.curso || 'Não informado'}</p>
+            <p><strong>Instituição:</strong> ${currentUser.instituicao || 'Não informada'}</p>
+            <p><strong>Saldo:</strong> ${currentUser.saldo !== undefined ? currentUser.saldo + ' moedas' : 'Não informado'}</p>
+          `;
+        }
+      }
+      
+      document.getElementById('accountModal').style.display = 'block';
+    }
+
+    function closeAccountModal() {
+      document.getElementById('accountModal').style.display = 'none';
+    }
+
+    // Mostra alert
+    function showAlert(message, type) {
+      const alertId = type === 'success' ? 'alertSuccess' : 'alertError';
+      const messageId = type === 'success' ? 'alertSuccessMessage' : 'alertErrorMessage';
+      
+      document.getElementById(messageId).textContent = message;
+      document.getElementById(alertId).classList.add('show');
+      
+      setTimeout(() => {
+        document.getElementById(alertId).classList.remove('show');
+      }, 5000);
+    }
+
+    // Fecha modais clicando fora
+    window.onclick = function(event) {
+      const vantagemModal = document.getElementById('vantagemModal');
+      const accountModal = document.getElementById('accountModal');
+      const dropdown = document.querySelector('.dropdown');
+      
+      if (event.target === vantagemModal) {
+        closeVantagemModal();
+      } else if (event.target === accountModal) {
+        closeAccountModal();
+      } else if (!dropdown.contains(event.target)) {
+        closeDropdown();
+      }
+    }
+
+    // Fecha dropdown quando clica fora dele
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.dropdown');
+      
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html> 

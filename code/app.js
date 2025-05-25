@@ -166,6 +166,31 @@ app.get('/vantagens', async (req, res) => {
   }
 });
 
+// Rota para visualizar vantagens (apenas alunos)
+app.get('/vantagens-aluno', async (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+  }
+  
+  try {
+    // Verifica se o usuário é um aluno
+    const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+    
+    if (!usuario || usuario.tipo !== 'aluno') {
+      return res.status(403).render('error', { 
+        erro: 'Acesso negado. Apenas alunos podem acessar esta página.' 
+      });
+    }
+    
+    res.render('vantagens-aluno');
+  } catch (error) {
+    console.error('Erro ao verificar usuário:', error);
+    res.status(500).render('error', { 
+      erro: 'Erro interno do servidor' 
+    });
+  }
+});
+
 // Rotas
 const alunoRoutes = require('./src/routes/alunoRoute');
 const instituicaoEnsinoRoutes = require('./src/routes/instituicaoEnsinoRoutes');

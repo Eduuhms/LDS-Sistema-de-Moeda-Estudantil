@@ -330,6 +330,7 @@
     <!-- Welcome Section -->
     <div class="welcome-section">
       <h1 class="welcome-title" id="welcomeTitle">Bem-vindo!</h1>
+      <p class="welcome-subtitle" id="welcomeSubtitle">Explore vantagens e gerencie suas moedas</p>
     </div>
 
     <div class="dashboard-grid" id="opcoesEmpresa">
@@ -363,9 +364,9 @@
           <div class="card-title">Consultar Vantagens</div>
         </div>
         <div class="card-content">
-          <p>Crie, edite e gerencie as vantagens oferecidas aos estudantes.</p>
+          <p>Veja as vantagens disponíveis para você.</p>
           <br>
-          <a href="/vantagens" class="btn btn-primary">Acessar Vantagens</a>
+          <a href="/vantagens-aluno" class="btn btn-primary">Acessar Vantagens</a>
         </div>
       </div>
     </div>
@@ -441,6 +442,7 @@
 
     function updateUIWithUserData(user) {
       const welcomeTitle = document.getElementById('welcomeTitle');
+      const welcomeSubtitle = document.getElementById('welcomeSubtitle');
       const userAvatar = document.getElementById('userAvatar');
       
       // Atualiza avatar com primeira letra do nome
@@ -455,6 +457,13 @@
         welcomeTitle.textContent = `Prazer, Professor ${user.nome}`;
       } else if (user.tipo === 'aluno') {
         welcomeTitle.textContent = `Bem-vindo, ${user.nome}`;
+        
+        // Atualiza navbar para alunos
+        const navbarMenu = document.querySelector('.navbar-menu');
+        const vantagensLink = navbarMenu.querySelector('a[href="/vantagens"]');
+        if (vantagensLink) {
+          vantagensLink.href = '/vantagens-aluno';
+        }
       } else {
         welcomeTitle.textContent = `Bem-vindo, ${user.nome || 'Usuário'}!`;
       }
