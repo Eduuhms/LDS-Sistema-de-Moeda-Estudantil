@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,13 +17,13 @@
       --white: #ffffff;
       --border: #e9ecef;
     }
-    
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
@@ -34,7 +35,7 @@
     /* Navbar */
     .navbar {
       background-color: var(--white);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       padding: 1rem 0;
       position: sticky;
       top: 0;
@@ -90,7 +91,7 @@
       right: 0;
       background-color: var(--white);
       min-width: 200px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       border-radius: 4px;
       overflow: hidden;
       margin-top: 0.5rem;
@@ -267,7 +268,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     .modal-content {
@@ -297,17 +298,25 @@
       .navbar-menu {
         gap: 1rem;
       }
-      
+
       .welcome-title {
         font-size: 2rem;
       }
-      
+
       .dashboard-grid {
         grid-template-columns: 1fr;
+      }
+
+      .modal-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        justify-content: flex-end;
       }
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <nav class="navbar">
@@ -318,6 +327,8 @@
           <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">E</div>
           <div class="dropdown-content" id="dropdownContent">
             <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
+             <a href="/editar-conta" onclick="closeDropdown();">Editar Conta</a>
+             <a href="#" onclick="openDeleteModal(); closeDropdown();">Excluir Conta</a>
             <a href="/logout">Sair</a>
           </div>
         </div>
@@ -350,7 +361,7 @@
           <div class="card-icon" style="background-color: var(--warning); color: white;">👥</div>
           <div class="card-title">Estudantes</div>
         </div> -->
-        <!-- <div class="card-content">
+      <!-- <div class="card-content">
           <p>Veja quais estudantes estão interagindo com suas vantagens.</p>
           <br>
           <a href="/estudantes" class="btn btn-outline">Ver Estudantes</a>
@@ -401,18 +412,18 @@
   <script>
     let currentUser = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       console.log('Página carregada, buscando dados do usuário...');
-      
+
       // Busca os dados do usuário logado
       fetch('/user-data')
         .then(response => {
           console.log('Resposta recebida:', response.status);
-          
+
           if (!response.ok) {
             throw new Error(`HTTP ${response.status}: ${response.statusText}`);
           }
-          
+
           return response.json();
         })
         .then(user => {
@@ -424,7 +435,7 @@
         })
         .catch(error => {
           console.error('Erro ao carregar dados do usuário:', error);
-          
+
           // Só redireciona se for erro de autenticação (401)
           if (error.message.includes('401')) {
             console.log('Usuário não autenticado, redirecionando para login...');
@@ -444,12 +455,12 @@
       const welcomeTitle = document.getElementById('welcomeTitle');
       const welcomeSubtitle = document.getElementById('welcomeSubtitle');
       const userAvatar = document.getElementById('userAvatar');
-      
+
       // Atualiza avatar com primeira letra do nome
       if (user.nome) {
         userAvatar.textContent = user.nome.charAt(0).toUpperCase();
       }
-      
+
       // Mensagem personalizada conforme o tipo de usuário
       if (user.tipo === 'empresa') {
         welcomeTitle.textContent = `Bem-vinda, ${user.nome}!`;
@@ -457,7 +468,7 @@
         welcomeTitle.textContent = `Prazer, Professor ${user.nome}`;
       } else if (user.tipo === 'aluno') {
         welcomeTitle.textContent = `Bem-vindo, ${user.nome}`;
-        
+
         // Atualiza navbar para alunos
         const navbarMenu = document.querySelector('.navbar-menu');
         const vantagensLink = navbarMenu.querySelector('a[href="/vantagens"]');
@@ -481,10 +492,10 @@
     }
 
     // Fecha dropdown quando clica fora dele
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       const dropdown = document.querySelector('.dropdown');
       const userAvatar = document.getElementById('userAvatar');
-      
+
       if (!dropdown.contains(event.target)) {
         dropdown.classList.remove('show');
       }
@@ -495,10 +506,10 @@
         const userEmail = document.getElementById('userEmail');
         const userType = document.getElementById('userType');
         const additionalInfo = document.getElementById('additionalInfo');
-        
+
         userEmail.textContent = currentUser.email;
         userType.textContent = currentUser.tipo;
-        
+
         // Informações específicas do tipo de usuário
         if (currentUser.tipo === 'empresa') {
           additionalInfo.innerHTML = `
@@ -519,7 +530,7 @@
           `;
         }
       }
-      
+
       document.getElementById('accountModal').style.display = 'block';
     }
 
@@ -527,7 +538,7 @@
       document.getElementById('accountModal').style.display = 'none';
     }
 
-    function opcoesTelaInicial(){
+    function opcoesTelaInicial() {
       const opcoesEmpresa = document.getElementById('opcoesEmpresa');
       const opcoesProfessor = document.getElementById('opcoesProfessor');
       const opcoesAluno = document.getElementById('opcoesAluno');
@@ -536,22 +547,94 @@
       opcoesProfessor.style.display = 'none';
       opcoesAluno.style.display = 'none';
 
-      if(currentUser.tipo === 'empresa'){
+      if (currentUser.tipo === 'empresa') {
         opcoesEmpresa.style.display = 'block';
-      } else if(currentUser.tipo === 'professor'){
+      } else if (currentUser.tipo === 'professor') {
         opcoesProfessor.style.display = 'block';
-      } else if(currentUser.tipo === 'aluno'){
-       opcoesAluno.style.display = 'block';
+      } else if (currentUser.tipo === 'aluno') {
+        opcoesAluno.style.display = 'block';
       }
     }
 
     // Fecha modal clicando fora dele
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const modal = document.getElementById('accountModal');
       if (event.target === modal) {
         modal.style.display = 'none';
       }
     }
+
+    function openDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'block';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+    }
+
+function confirmDelete() {
+  let fetchUrl = '';
+  let deleteUrl = '';
+
+  if (currentUser.tipo === 'aluno') {
+    fetchUrl = `/alunos/usuario/${currentUser.id}`;
+  } else if (currentUser.tipo === 'professor') {
+    fetchUrl = `/professores/usuario/${currentUser.id}`;
+  } else if (currentUser.tipo === 'empresa') {
+    fetchUrl = `/empresas/usuario/${currentUser.id}`;
+  }
+
+  // Primeiro busca o ID específico do recurso associado ao usuário
+  fetch(fetchUrl)
+    .then(response => response.json())
+    .then(data => {
+      if (!data || !data.id) {
+        throw new Error(`${currentUser.tipo.charAt(0).toUpperCase() + currentUser.tipo.slice(1)} não encontrado(a)`);
+      }
+
+      // Monta a URL para deletar usando o ID encontrado
+      if (currentUser.tipo === 'aluno') {
+        deleteUrl = `/alunos/${data.id}`;
+      } else if (currentUser.tipo === 'professor') {
+        deleteUrl = `/professores/${data.id}`;
+      } else if (currentUser.tipo === 'empresa') {
+        deleteUrl = `/empresas/${data.id}`;
+      }
+
+      // Agora envia o DELETE para o endpoint correto
+      return fetch(deleteUrl, {
+        method: 'DELETE'
+      });
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Erro ao excluir conta');
+      }
+      return response.json();
+    })
+    .then(data => {
+      alert('Conta excluída com sucesso!');
+      window.location.href = '/logout';
+    })
+    .catch(error => {
+      console.error('Erro:', error);
+      alert('Ocorreu um erro ao excluir a conta');
+      closeDeleteModal();
+    });
+}
   </script>
+  <!-- Modal de confirmação de exclusão -->
+  <div id="deleteModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeDeleteModal()">&times;</span>
+      <h2>Confirmar Exclusão</h2>
+      <p>Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.</p>
+      <div class="modal-actions">
+        <button class="btn btn-danger" onclick="confirmDelete()">Confirmar Exclusão</button>
+        <button class="btn" onclick="closeDeleteModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
 </body>
+
 </html>

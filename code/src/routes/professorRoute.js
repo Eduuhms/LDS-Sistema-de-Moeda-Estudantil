@@ -8,5 +8,6 @@ router.get('/', ProfessorController.listar);
 router.get('/:id', ProfessorController.buscarPorId);
 router.put('/atualizar/:id', ProfessorController.atualizar);
 router.delete('/:id', ProfessorController.excluir);
+router.get('/usuario/:usuarioId', ProfessorController.buscarPorUsuarioId);
 
 module.exports = router;

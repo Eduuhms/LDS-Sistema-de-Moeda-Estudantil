@@ -291,6 +291,37 @@ class EmpresaController {
       });
     }
   }
+  static async buscarPorUsuarioId(req, res) {
+    try {
+        const { usuarioId } = req.params;
+        
+        if (!usuarioId || isNaN(parseInt(usuarioId))) {
+            return res.status(400).json({ erro: 'ID de usuário inválido' });
+        }
+        
+        const empresa = await EmpresaModel.buscarPorUsuarioId(usuarioId);
+        
+        if (!empresa) {
+            return res.status(404).json({ erro: 'Empresa não encontrada para este usuário' });
+        }
+        
+        return res.status(200).json({
+            id: empresa.id,
+            usuario_id: empresa.usuario_id,
+            cnpj: empresa.cnpj,
+            endereco: empresa.endereco,
+            telefone: empresa.telefone,
+            descricao: empresa.descricao
+        });
+    } catch (error) {
+        console.error('Erro ao buscar empresa do usuário:', error);
+        return res.status(500).json({ 
+            erro: 'Falha ao buscar empresa. Por favor, tente novamente mais tarde.' 
+        });
+    }
 }
+}
+
+
 
 module.exports = EmpresaController;

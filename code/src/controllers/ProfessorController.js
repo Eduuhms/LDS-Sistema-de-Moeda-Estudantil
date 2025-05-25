@@ -241,6 +241,25 @@ class ProfessorController {
       return res.status(500).json({ erro: 'Erro ao excluir professor.' });
     }
   }
+  static async buscarPorUsuarioId(req, res) {
+    try {
+        const { usuarioId } = req.params;
+        
+        if (!usuarioId || isNaN(parseInt(usuarioId))) {
+            return res.status(400).json({ erro: 'ID de usuário inválido' });
+        }
+        
+        const professor = await ProfessorModel.buscarPorUsuarioId(usuarioId);
+        
+        if (!professor) {
+            return res.status(404).json({ erro: 'Professor não encontrado para este usuário' });
+        }
+        
+        return res.status(200).json(professor);
+    } catch (error) {
+        return res.status(500).json({ erro: 'Falha ao buscar professor. Por favor, tente novamente mais tarde.' });
+    }
+}
 }
 
 module.exports = ProfessorController;

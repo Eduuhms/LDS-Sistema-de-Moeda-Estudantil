@@ -40,6 +40,15 @@ app.get('/cadastro', (req, res) => {
   res.render('cadastro');
 });
 
+// Rota para edição de conta
+app.get('/editar-conta', (req, res) => {
+  if (!req.session.userId) {
+    return res.redirect('/login');
+  }
+  res.render('editarConta');
+});
+
+
 // Rota de login
 app.post('/login', async (req, res) => {
   const { email, senha } = req.body;

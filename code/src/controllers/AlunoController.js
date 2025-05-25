@@ -279,6 +279,25 @@ class AlunoController {
       return res.status(500).json({ erro: 'Erro ao excluir aluno. Por favor, tente novamente mais tarde.' });
     }
   }
+  static async buscarPorUsuarioId(req, res) {
+    try {
+        const { usuarioId } = req.params;
+        
+        if (!usuarioId || isNaN(parseInt(usuarioId))) {
+            return res.status(400).json({ erro: 'ID de usuário inválido' });
+        }
+        
+        const aluno = await AlunoModel.buscarPorUsuarioId(usuarioId);
+        
+        if (!aluno) {
+            return res.status(404).json({ erro: 'Aluno não encontrado para este usuário' });
+        }
+        
+        return res.status(200).json(aluno);
+    } catch (error) {
+        return res.status(500).json({ erro: 'Falha ao buscar aluno. Por favor, tente novamente mais tarde.' });
+    }
+}
 }
 
 module.exports = AlunoController;
