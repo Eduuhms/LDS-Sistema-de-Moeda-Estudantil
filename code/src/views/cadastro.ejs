@@ -511,6 +511,78 @@
           });
         }
       });
+
+      // Máscaras para formatação dos campos
+      
+      // Máscara para CPF do Aluno
+      document.getElementById('cpfAluno').addEventListener('input', function(e) {
+        let cpf = e.target.value.replace(/\D/g, '');
+        if (cpf.length > 11) cpf = cpf.substring(0, 11);
+        
+        if (cpf.length > 9) {
+          cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        } else if (cpf.length > 6) {
+          cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+        } else if (cpf.length > 3) {
+          cpf = cpf.replace(/(\d{3})(\d{3})/, '$1.$2');
+        }
+        
+        e.target.value = cpf;
+      });
+
+      // Máscara para CPF do Professor
+      document.getElementById('cpfProfessor').addEventListener('input', function(e) {
+        let cpf = e.target.value.replace(/\D/g, '');
+        if (cpf.length > 11) cpf = cpf.substring(0, 11);
+        
+        if (cpf.length > 9) {
+          cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+        } else if (cpf.length > 6) {
+          cpf = cpf.replace(/(\d{3})(\d{3})(\d{3})/, '$1.$2.$3');
+        } else if (cpf.length > 3) {
+          cpf = cpf.replace(/(\d{3})(\d{3})/, '$1.$2');
+        }
+        
+        e.target.value = cpf;
+      });
+
+      // Máscara para CNPJ da Empresa
+      document.getElementById('cnpjEmpresa').addEventListener('input', function(e) {
+        let cnpj = e.target.value.replace(/\D/g, '');
+        if (cnpj.length > 14) cnpj = cnpj.substring(0, 14);
+        
+        if (cnpj.length > 12) {
+          cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})$/, '$1.$2.$3/$4-$5');
+        } else if (cnpj.length > 8) {
+          cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})$/, '$1.$2.$3/$4');
+        } else if (cnpj.length > 5) {
+          cnpj = cnpj.replace(/^(\d{2})(\d{3})(\d{3})$/, '$1.$2.$3');
+        } else if (cnpj.length > 2) {
+          cnpj = cnpj.replace(/^(\d{2})(\d{3})$/, '$1.$2');
+        }
+        
+        e.target.value = cnpj;
+      });
+
+      // Máscara para Telefone da Empresa (bônus)
+      document.getElementById('telefoneEmpresa').addEventListener('input', function(e) {
+        let telefone = e.target.value.replace(/\D/g, '');
+        if (telefone.length > 11) telefone = telefone.substring(0, 11);
+        
+        if (telefone.length > 6) {
+          if (telefone.length === 11) {
+            telefone = telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+          } else {
+            telefone = telefone.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+          }
+        } else if (telefone.length > 2) {
+          telefone = telefone.replace(/^(\d{2})(\d+)$/, '($1) $2');
+        } else if (telefone.length > 0) {
+          telefone = telefone.replace(/^(\d{1,2})$/, '($1');
+        }
+        
+        e.target.value = telefone;
+      });
     });
   </script>
 </body>

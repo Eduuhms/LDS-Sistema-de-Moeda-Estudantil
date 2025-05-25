@@ -574,6 +574,31 @@
                 }
             });
 
+            // Máscaras para formatação dos campos editáveis
+            
+            // Máscara para Telefone da Empresa (campo editável)
+            const telefoneEmpresa = document.getElementById('telefoneEmpresa');
+            if (telefoneEmpresa) {
+                telefoneEmpresa.addEventListener('input', function(e) {
+                    let telefone = e.target.value.replace(/\D/g, '');
+                    if (telefone.length > 11) telefone = telefone.substring(0, 11);
+                    
+                    if (telefone.length > 6) {
+                        if (telefone.length === 11) {
+                            telefone = telefone.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+                        } else {
+                            telefone = telefone.replace(/^(\d{2})(\d{4})(\d{4})$/, '($1) $2-$3');
+                        }
+                    } else if (telefone.length > 2) {
+                        telefone = telefone.replace(/^(\d{2})(\d+)$/, '($1) $2');
+                    } else if (telefone.length > 0) {
+                        telefone = telefone.replace(/^(\d{1,2})$/, '($1');
+                    }
+                    
+                    e.target.value = telefone;
+                });
+            }
+
         });
     </script>
 </body>
