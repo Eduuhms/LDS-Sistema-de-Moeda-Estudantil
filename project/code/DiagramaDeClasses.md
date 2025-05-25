@@ -3,6 +3,7 @@
 abstract class Usuario {
   - id: Int
   - nome: String
+  - tipoUsuario: TipoUsuario
   - email: String
   - senha: String
   + autenticar(email: String, senha: String): boolean
