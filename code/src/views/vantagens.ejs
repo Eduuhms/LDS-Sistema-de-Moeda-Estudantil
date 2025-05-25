@@ -403,6 +403,16 @@
       display: block;
     }
 
+    .form-text {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 0.25rem;
+    }
+
+    .text-muted {
+      color: #6c757d !important;
+    }
+
     @media (max-width: 768px) {
       .page-header {
         flex-direction: column;
@@ -505,7 +515,8 @@
         
         <div class="form-group">
           <label class="form-label" for="custoMoedas">Custo em Moedas</label>
-          <input type="number" id="custoMoedas" class="form-control" min="1" required>
+          <input type="number" id="custoMoedas" class="form-control" min="1" step="1" required>
+          <small class="form-text text-muted">O valor deve ser maior que zero</small>
         </div>
         
         <div class="form-group">
@@ -542,6 +553,37 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadUserData();
       loadVantagens();
+      
+      // Validação em tempo real para o campo de custo em moedas
+      document.getElementById('custoMoedas').addEventListener('input', function(e) {
+        const value = parseInt(e.target.value);
+        const submitBtn = document.getElementById('submitBtn');
+        
+        if (isNaN(value) || value <= 0) {
+          e.target.style.borderColor = '#dc3545';
+          
+          // Remove mensagem de erro anterior se existir
+          let errorMsg = e.target.parentNode.querySelector('.error-msg-custo');
+          if (!errorMsg) {
+            errorMsg = document.createElement('small');
+            errorMsg.className = 'error-msg-custo';
+            errorMsg.style.color = '#dc3545';
+            errorMsg.style.fontSize = '0.875rem';
+            errorMsg.style.marginTop = '0.25rem';
+            errorMsg.style.display = 'block';
+            e.target.parentNode.appendChild(errorMsg);
+          }
+          errorMsg.textContent = 'O valor deve ser maior que zero';
+        } else {
+          e.target.style.borderColor = '#28a745';
+          
+          // Remove mensagem de erro se existir
+          const errorMsg = e.target.parentNode.querySelector('.error-msg-custo');
+          if (errorMsg) {
+            errorMsg.remove();
+          }
+        }
+      });
     });
 
     // Carrega dados do usuário
@@ -715,6 +757,12 @@
         submitBtn.textContent = 'Salvando...';
         submitBtn.disabled = true;
         
+        // Validação do custo em moedas
+        const custoMoedasValue = parseInt(document.getElementById('custoMoedas').value);
+        if (isNaN(custoMoedasValue) || custoMoedasValue <= 0) {
+          throw new Error('O custo em moedas deve ser um número positivo maior que zero');
+        }
+        
         // Busca o ID da empresa no momento do envio
         const empresaResponse = await fetch('/empresas/usuario');
         if (!empresaResponse.ok) {
@@ -726,7 +774,7 @@
           nome: document.getElementById('nome').value,
           descricao: document.getElementById('descricao').value,
           foto: document.getElementById('foto').value,
-          custoMoedas: parseInt(document.getElementById('custoMoedas').value),
+          custoMoedas: custoMoedasValue,
           empresaId: empresaData.id
         };
         

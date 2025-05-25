@@ -11,6 +11,14 @@ class VantagemController {
                 });
             }
 
+            // Validação do custo em moedas
+            const custoNumerico = parseInt(custoMoedas);
+            if (isNaN(custoNumerico) || custoNumerico <= 0) {
+                return res.status(400).json({
+                    erro: 'O custo em moedas deve ser um número positivo maior que zero'
+                });
+            }
+
             const vantagem = await VantagemModel.criar({
                 nome,
                 descricao,
@@ -46,6 +54,14 @@ class VantagemController {
             if (!nome || !descricao || !foto || !custoMoedas || !empresaId) {
                 return res.status(400).json({
                     erro: 'Todos os campos são obrigatórios'
+                });
+            }
+
+            // Validação do custo em moedas
+            const custoNumerico = parseInt(custoMoedas);
+            if (isNaN(custoNumerico) || custoNumerico <= 0) {
+                return res.status(400).json({
+                    erro: 'O custo em moedas deve ser um número positivo maior que zero'
                 });
             }
 
