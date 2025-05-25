@@ -48,6 +48,15 @@ class VantagemModel {
 
         return vantagem[0] || null;
     }
+
+    static async buscarPorEmpresa(empresaId) {
+        const [vantagens] = await db.query(
+            'SELECT * FROM vantagens WHERE empresa_id = ?',
+            [empresaId]
+        );
+
+        return vantagens;
+    }
 }
 
 module.exports = VantagemModel;

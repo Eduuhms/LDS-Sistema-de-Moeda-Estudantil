@@ -538,7 +538,6 @@
   <script>
     let currentUser = null;
     let currentVantagem = null;
-    let empresaId = null;
 
     document.addEventListener('DOMContentLoaded', function() {
       loadUserData();
@@ -562,13 +561,6 @@
           userAvatar.textContent = currentUser.nome.charAt(0).toUpperCase();
         }
         
-        // Busca o ID da empresa
-        const empresaResponse = await fetch('/empresas/usuario');
-        if (empresaResponse.ok) {
-          const empresaData = await empresaResponse.json();
-          empresaId = empresaData.id;
-        }
-        
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         window.location.href = '/login';
@@ -586,7 +578,7 @@
         grid.style.display = 'none';
         emptyState.style.display = 'none';
         
-        const response = await fetch('/vantagens/listar');
+        const response = await fetch('/vantagens/listar-empresa');
         
         if (!response.ok) {
           throw new Error('Erro ao carregar vantagens');
@@ -723,12 +715,19 @@
         submitBtn.textContent = 'Salvando...';
         submitBtn.disabled = true;
         
+        // Busca o ID da empresa no momento do envio
+        const empresaResponse = await fetch('/empresas/usuario');
+        if (!empresaResponse.ok) {
+          throw new Error('Erro ao buscar dados da empresa');
+        }
+        const empresaData = await empresaResponse.json();
+        
         const formData = {
           nome: document.getElementById('nome').value,
           descricao: document.getElementById('descricao').value,
           foto: document.getElementById('foto').value,
           custoMoedas: parseInt(document.getElementById('custoMoedas').value),
-          empresaId: empresaId
+          empresaId: empresaData.id
         };
         
         const isEdit = currentVantagem !== null;

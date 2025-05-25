@@ -138,6 +138,31 @@ class VantagemController {
             });
         }
     }
+
+    static async buscarPorEmpresaLogada(req, res) {
+        try {
+            if (!req.session.userId) {
+                return res.status(401).json({ erro: 'Usuário não autenticado' });
+            }
+
+            // Busca o ID da empresa baseado no usuário logado
+            const EmpresaModel = require('../models/EmpresaModel');
+            const empresa = await EmpresaModel.buscarPorUsuarioId(req.session.userId);
+            
+            if (!empresa) {
+                return res.status(404).json({ erro: 'Empresa não encontrada para este usuário' });
+            }
+
+            const vantagens = await VantagemModel.buscarPorEmpresa(empresa.id);
+
+            return res.status(200).json(vantagens);
+        } catch (error) {
+            console.error('Erro ao buscar vantagens da empresa:', error);
+            return res.status(500).json({
+                erro: 'Falha ao buscar vantagens da empresa. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
 }
 
 module.exports = VantagemController;
