@@ -815,27 +815,15 @@
 
     // Fecha modais clicando fora
     window.onclick = function(event) {
-      const vantagemModal = document.getElementById('vantagemModal');
       const accountModal = document.getElementById('accountModal');
       const dropdown = document.querySelector('.dropdown');
       
-      if (event.target === vantagemModal) {
-        closeVantagemModal();
-      } else if (event.target === accountModal) {
+      if (event.target === accountModal) {
         closeAccountModal();
       } else if (!dropdown.contains(event.target)) {
         closeDropdown();
       }
     }
-
-    // Fecha dropdown quando clica fora dele
-    document.addEventListener('click', function(event) {
-      const dropdown = document.querySelector('.dropdown');
-      
-      if (!dropdown.contains(event.target)) {
-        dropdown.classList.remove('show');
-      }
-    });
   </script>
 </body>
 </html> 
