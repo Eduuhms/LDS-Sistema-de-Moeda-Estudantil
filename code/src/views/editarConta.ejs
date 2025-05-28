@@ -103,10 +103,26 @@
             background-color: #c82333;
         }
 
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            color: white;
+        }
+
         .btn-group {
             display: flex;
             gap: 1rem;
             margin-top: 2rem;
+            justify-content: space-between;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            max-width: 200px;
         }
 
         .form-section {
@@ -141,6 +157,12 @@
 
             .btn-group {
                 flex-direction: column;
+                justify-content: stretch;
+            }
+
+            .btn-group .btn {
+                max-width: none;
+                margin-bottom: 0.5rem;
             }
         }
     </style>
@@ -259,6 +281,9 @@
 
             <div class="btn-group">
                 <button type="submit" class="btn">Salvar Alterações</button>
+                <a href="/" class="btn btn-secondary" id="btnVoltar">
+                    <span style="margin-right: 8px;">←</span>Voltar ao Início
+                </a>
             </div>
         </form>
     </div>
@@ -598,6 +623,63 @@
                     e.target.value = telefone;
                 });
             }
+
+            // Controle de alterações no formulário
+            let formAlterado = false;
+            let valoresOriginais = {};
+
+            // Salva os valores originais após carregar os dados
+            function salvarValoresOriginais() {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.type !== 'hidden' && !input.readOnly) {
+                        valoresOriginais[input.id] = input.value;
+                    }
+                });
+            }
+
+            // Detecta alterações nos campos
+            function detectarAlteracoes() {
+                const inputs = form.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.type !== 'hidden' && !input.readOnly) {
+                        input.addEventListener('input', function() {
+                            if (valoresOriginais[input.id] !== input.value) {
+                                formAlterado = true;
+                            } else {
+                                // Verifica se ainda há alterações em outros campos
+                                formAlterado = false;
+                                inputs.forEach(otherInput => {
+                                    if (otherInput.type !== 'hidden' && !otherInput.readOnly) {
+                                        if (valoresOriginais[otherInput.id] !== otherInput.value) {
+                                            formAlterado = true;
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+
+            // Confirmação antes de sair se houver alterações
+            document.getElementById('btnVoltar').addEventListener('click', function(e) {
+                if (formAlterado) {
+                    const confirmacao = confirm(
+                        'Você fez alterações no formulário que não foram salvas.\n\n' +
+                        'Tem certeza que deseja sair sem salvar?'
+                    );
+                    if (!confirmacao) {
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // Salva valores originais após carregar dados do usuário
+            setTimeout(() => {
+                salvarValoresOriginais();
+                detectarAlteracoes();
+            }, 1000);
 
         });
     </script>
