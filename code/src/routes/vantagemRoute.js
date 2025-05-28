@@ -8,5 +8,6 @@ router.delete('/deletar/:id', VantagemController.deletar);
 router.get('/listar', VantagemController.buscarTodos);
 router.get('/listar-empresa', VantagemController.buscarPorEmpresaLogada);
 router.get('/buscar/:id', VantagemController.buscarPorId);
-
+router.get('/empresa', VantagemController.renderVantagensEmpresa);
+router.get('/aluno', VantagemController.renderVantagensAluno);
 module.exports = router;

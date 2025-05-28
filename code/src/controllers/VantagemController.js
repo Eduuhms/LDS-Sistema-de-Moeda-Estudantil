@@ -179,6 +179,33 @@ class VantagemController {
             });
         }
     }
+
+    
+    static async renderVantagensEmpresa(req, res) {
+        if (!req.session.userId) {
+            return res.redirect('/usuario/login');
+        }
+        // Verifica se o usuário é uma empresa
+        const EmpresaModel = require('../models/EmpresaModel');
+        const usuario = await EmpresaModel.buscarPorUsuarioId(req.session.userId);
+        if (!usuario) {
+            return res.status(403).render('error', { erro: 'Acesso negado. Apenas empresas podem acessar esta página.' });
+        }
+        res.render('vantagens-empresa');
+    }
+
+    static async renderVantagensAluno(req, res) {
+        if (!req.session.userId) {
+            return res.redirect('/usuario/login');
+        }
+        // Verifica se o usuário é um aluno
+        const AlunoModel = require('../models/AlunoModel');
+        const usuario = await AlunoModel.buscarPorUsuarioId(req.session.userId);
+        if (!usuario) {
+            return res.status(403).render('error', { erro: 'Acesso negado. Apenas alunos podem acessar esta página.' });
+        }
+        res.render('vantagens-aluno');
+    }
 }
 
 module.exports = VantagemController;

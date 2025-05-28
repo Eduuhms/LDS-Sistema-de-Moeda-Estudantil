@@ -48,54 +48,54 @@ app.get('/editar-conta', (req, res) => {
   res.render('editarConta');
 });
 
-app.get('/vantagens-empresa', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
+// app.get('/vantagens-empresa', async (req, res) => {
+//   if (!req.session.userId) {
+//     return res.redirect('/login');
+//   }
   
-  try {
-    // Verifica se o usuário é uma empresa
-    const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+//   try {
+//     // Verifica se o usuário é uma empresa
+//     const usuario = await UsuarioModel.buscarPorId(req.session.userId);
     
-    if (!usuario || usuario.tipo !== 'empresa') {
-      return res.status(403).render('error', { 
-        erro: 'Acesso negado. Apenas empresas podem acessar esta página.' 
-      });
-    }
+//     if (!usuario || usuario.tipo !== 'empresa') {
+//       return res.status(403).render('error', { 
+//         erro: 'Acesso negado. Apenas empresas podem acessar esta página.' 
+//       });
+//     }
     
-    res.render('vantagens-empresa');
-  } catch (error) {
-    console.error('Erro ao verificar usuário:', error);
-    res.status(500).render('error', { 
-      erro: 'Erro interno do servidor' 
-    });
-  }
-});
+//     res.render('vantagens-empresa');
+//   } catch (error) {
+//     console.error('Erro ao verificar usuário:', error);
+//     res.status(500).render('error', { 
+//       erro: 'Erro interno do servidor' 
+//     });
+//   }
+// });
 
-// Rota para visualizar vantagens (apenas alunos)
-app.get('/vantagens-aluno', async (req, res) => {
-  if (!req.session.userId) {
-    return res.redirect('/login');
-  }
+// // Rota para visualizar vantagens (apenas alunos)
+// app.get('/vantagens-aluno', async (req, res) => {
+//   if (!req.session.userId) {
+//     return res.redirect('/login');
+//   }
   
-  try {
-    // Verifica se o usuário é um aluno
-    const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+//   try {
+//     // Verifica se o usuário é um aluno
+//     const usuario = await UsuarioModel.buscarPorId(req.session.userId);
     
-    if (!usuario || usuario.tipo !== 'aluno') {
-      return res.status(403).render('error', { 
-        erro: 'Acesso negado. Apenas alunos podem acessar esta página.' 
-      });
-    }
+//     if (!usuario || usuario.tipo !== 'aluno') {
+//       return res.status(403).render('error', { 
+//         erro: 'Acesso negado. Apenas alunos podem acessar esta página.' 
+//       });
+//     }
     
-    res.render('vantagens-aluno');
-  } catch (error) {
-    console.error('Erro ao verificar usuário:', error);
-    res.status(500).render('error', { 
-      erro: 'Erro interno do servidor' 
-    });
-  }
-});
+//     res.render('vantagens-aluno');
+//   } catch (error) {
+//     console.error('Erro ao verificar usuário:', error);
+//     res.status(500).render('error', { 
+//       erro: 'Erro interno do servidor' 
+//     });
+//   }
+// });
 
 // Rotas
 const alunoRoutes = require('./src/routes/alunoRoute');

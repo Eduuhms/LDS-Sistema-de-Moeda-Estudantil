@@ -27,7 +27,7 @@ class UsuarioController {
 
     static async logout(req, res) {
         req.session.destroy();
-        res.redirect('/login');
+        res.redirect('/usuario/login');
     }
 
     static async userData(req, res) {
@@ -82,7 +82,7 @@ class UsuarioController {
 
     static renderTelaInicial(req, res) {
         if (!req.session.userId) {
-            return res.redirect('/login');
+            return res.redirect('/usuario/login');
         }
         res.render('telaInicial');
     }
@@ -100,7 +100,7 @@ class UsuarioController {
 
     static renderEditarConta(req, res) {
         if (!req.session.userId) {
-            return res.redirect('/login');
+            return res.redirect('/usuario/login');
         }
         res.render('editarConta');
     }

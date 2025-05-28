@@ -353,7 +353,7 @@
         <div class="card-content">
           <p>Crie, edite e gerencie as vantagens oferecidas aos estudantes.</p>
           <br>
-          <a href="/vantagens-empresa" class="btn btn-primary">Acessar Vantagens</a>
+          <a href="/vantagens/empresa" class="btn btn-primary">Acessar Vantagens</a>
         </div>
       </div>
       <!-- <div class="card">
@@ -377,7 +377,7 @@
         <div class="card-content">
           <p>Veja as vantagens disponíveis para você.</p>
           <br>
-          <a href="/vantagens-aluno" class="btn btn-primary">Acessar Vantagens</a>
+          <a href="/vantagens/aluno" class="btn btn-primary">Acessar Vantagens</a>
         </div>
       </div>
     </div>
@@ -471,9 +471,9 @@
 
         // Atualiza navbar para alunos
         const navbarMenu = document.querySelector('.navbar-menu');
-        const vantagensLink = navbarMenu.querySelector('a[href="/vantagens"]');
+        const vantagensLink = navbarMenu.querySelector('a[href="/vantagens/aluno"]');
         if (vantagensLink) {
-          vantagensLink.href = '/vantagens-aluno';
+          vantagensLink.href = '/vantagens/aluno';
         }
       } else {
         welcomeTitle.textContent = `Bem-vindo, ${user.nome || 'Usuário'}!`;
