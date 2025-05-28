@@ -327,9 +327,9 @@
           <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">E</div>
           <div class="dropdown-content" id="dropdownContent">
             <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
-             <a href="/editar-conta" onclick="closeDropdown();">Editar Conta</a>
+             <a href="/usuario/editar-conta" onclick="closeDropdown();">Editar Conta</a>
              <a href="#" onclick="openDeleteModal(); closeDropdown();">Excluir Conta</a>
-            <a href="/logout">Sair</a>
+            <a href="/usuario/logout">Sair</a>
           </div>
         </div>
       </div>
@@ -416,7 +416,7 @@
       console.log('Página carregada, buscando dados do usuário...');
 
       // Busca os dados do usuário logado
-      fetch('/user-data')
+      fetch('/usuario/user-data')
         .then(response => {
           console.log('Resposta recebida:', response.status);
 
@@ -440,7 +440,7 @@
           if (error.message.includes('401')) {
             console.log('Usuário não autenticado, redirecionando para login...');
             setTimeout(() => {
-              window.location.href = '/login';
+              window.location.href = '/usuario/login';
             }, 1000); // Adiciona um delay de 1 segundo
           } else {
             // Para outros erros, mostra uma mensagem na tela
@@ -614,7 +614,7 @@ function confirmDelete() {
     })
     .then(data => {
       alert('Conta excluída com sucesso!');
-      window.location.href = '/logout';
+      window.location.href = '/usuario/logout';
     })
     .catch(error => {
       console.error('Erro:', error);

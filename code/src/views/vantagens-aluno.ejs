@@ -552,7 +552,7 @@
           <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">A</div>
           <div class="dropdown-content" id="dropdownContent">
             <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
-            <a href="/logout">Sair</a>
+            <a href="/usuario/logout">Sair</a>
           </div>
         </div>
       </div>
@@ -660,7 +660,7 @@
     // Carrega dados do usuário
     async function loadUserData() {
       try {
-        const response = await fetch('/user-data');
+        const response = await fetch('/usuario/user-data');
         
         if (!response.ok) {
           throw new Error('Erro ao carregar dados do usuário');
@@ -682,7 +682,7 @@
         
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
-        window.location.href = '/login';
+        window.location.href = '/usuario/login';
       }
     }
 
