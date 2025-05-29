@@ -82,6 +82,7 @@ class AlunoModel {
       [novoSaldo, id]
     );
   }
+  
 }
 
 module.exports = AlunoModel;

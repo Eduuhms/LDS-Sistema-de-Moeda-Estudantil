@@ -104,6 +104,7 @@ const empresaRoutes = require('./src/routes/empresaRoutes');
 const vantagemRoutes = require('./src/routes/vantagemRoute');
 const professorRoutes = require('./src/routes/professorRoute');
 const usuarioRoutes = require('./src/routes/usuarioRoute');
+const transacaoRoutes = require('./src/routes/transacaoRoute');
 
 app.use('/alunos', alunoRoutes);
 app.use('/instituicoes', instituicaoEnsinoRoutes);
@@ -111,6 +112,7 @@ app.use('/empresas', empresaRoutes);
 app.use('/vantagens', vantagemRoutes);
 app.use('/professores', professorRoutes);
 app.use('/usuario', usuarioRoutes);
+app.use('/transacoes', transacaoRoutes);
 
 // Tratamento de erros
 app.use((err, req, res, next) => {

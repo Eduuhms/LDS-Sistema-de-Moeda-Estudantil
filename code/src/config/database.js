@@ -90,6 +90,21 @@ const initDb = async () => {
   )
 `);
 
+      await pool.query(
+        `CREATE TABLE IF NOT EXISTS transacoes (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      quantidade DECIMAL(10,2) NOT NULL,
+      mensagem TEXT,
+      origem_id INT NOT NULL,
+      destino_id INT NOT NULL,
+      tipo_transacao VARCHAR(50) NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      FOREIGN KEY (origem_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+      FOREIGN KEY (destino_id) REFERENCES usuarios(id) ON DELETE CASCADE
+    )`
+    );
+
     await pool.query(`
         CREATE TABLE IF NOT EXISTS vantagens (
           id INT AUTO_INCREMENT PRIMARY KEY,

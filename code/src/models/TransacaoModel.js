@@ -2,10 +2,11 @@ const db = require('../config/database');
 
 class TransacaoModel {
     static async criar(transacao) {
-        const { dataHora, quantidade, mensagem, origemId, destinoId, tipoTransacao } = transacao;
+        const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = transacao;
+
         const [result] = await db.query(
-            'INSERT INTO transacoes (data_hora, quantidade, mensagem, origem_id, destino_id, tipo_transacao) VALUES (?, ?, ?, ?, ?, ?)',
-            [dataHora || new Date(), quantidade, mensagem, origemId, destinoId, tipoTransacao]
+            'INSERT INTO transacoes (quantidade, mensagem, origem_id, destino_id, tipo_transacao) VALUES (?, ?, ?, ?, ?)',
+            [quantidade, mensagem, origemId, destinoId, tipoTransacao]
         );
         return result.insertId;
     }
@@ -24,10 +25,10 @@ class TransacaoModel {
     }
 
     static async atualizar(id, novosDados) {
-        const { dataHora, quantidade, mensagem, origemId, destinoId, tipoTransacao } = novosDados;
+        const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = novosDados;
         await db.query(
-            'UPDATE transacoes SET data_hora = ?, quantidade = ?, mensagem = ?, origem_id = ?, destino_id = ?, tipo_transacao = ? WHERE id = ?',
-            [dataHora, quantidade, mensagem, origemId, destinoId, tipoTransacao, id]
+            'UPDATE transacoes SET quantidade = ?, mensagem = ?, origem_id = ?, destino_id = ?, tipo_transacao = ? WHERE id = ?',
+            [quantidade, mensagem, origemId, destinoId, tipoTransacao, id]
         );
     }
 

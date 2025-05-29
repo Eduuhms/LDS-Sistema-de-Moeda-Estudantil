@@ -298,6 +298,7 @@ class AlunoController {
         return res.status(500).json({ erro: 'Falha ao buscar aluno. Por favor, tente novamente mais tarde.' });
     }
 }
+
 }
 
 module.exports = AlunoController;
