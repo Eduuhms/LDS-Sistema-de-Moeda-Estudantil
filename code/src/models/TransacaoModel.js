@@ -35,6 +35,28 @@ class TransacaoModel {
     static async excluir(id) {
         await db.query('DELETE FROM transacoes WHERE id = ?', [id]);
     }
+
+    static async buscarPorUsuario(usuarioId) {
+        try {
+            const connection = await db.getConnection();
+            const [rows] = await connection.execute(
+                `SELECT t.*, 
+                        u_origem.nome as nome_origem, 
+                        u_destino.nome as nome_destino
+                 FROM transacoes t
+                 LEFT JOIN usuarios u_origem ON t.origem_id = u_origem.id
+                 LEFT JOIN usuarios u_destino ON t.destino_id = u_destino.id
+                 WHERE t.origem_id = ? OR t.destino_id = ?
+                 ORDER BY t.created_at DESC`,
+                [usuarioId, usuarioId]
+            );
+            connection.release();
+            return rows;
+        } catch (error) {
+            console.error('Erro ao buscar transações do usuário:', error);
+            throw error;
+        }
+    }
 }
 
 module.exports = TransacaoModel;

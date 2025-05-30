@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Histórico de Transações - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --white: #ffffff;
+      --border: #e9ecef;
+      --gold: #ffd700;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+    }
+
+    .navbar {
+      background-color: var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #6c757d;
+    }
+
+    .transactions-container {
+      background: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .transaction-item {
+      display: flex;
+      align-items: center;
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      transition: background-color 0.2s;
+    }
+
+    .transaction-item:last-child {
+      border-bottom: none;
+    }
+
+    .transaction-item:hover {
+      background-color: var(--light);
+    }
+
+    .transaction-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 1rem;
+      font-size: 1.2rem;
+    }
+
+    .transaction-gain {
+      background-color: var(--success);
+      color: white;
+    }
+
+    .transaction-loss {
+      background-color: var(--danger);
+      color: white;
+    }
+
+    .transaction-details {
+      flex: 1;
+    }
+
+    .transaction-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    .transaction-description {
+      color: #6c757d;
+      font-size: 0.9rem;
+    }
+
+    .transaction-amount {
+      font-weight: bold;
+      margin-left: 1rem;
+    }
+
+    .amount-gain {
+      color: var(--success);
+    }
+
+    .amount-loss {
+      color: var(--danger);
+    }
+
+    .transaction-date {
+      color: #6c757d;
+      font-size: 0.85rem;
+      margin-left: 1rem;
+    }
+
+    .no-transactions {
+      text-align: center;
+      padding: 2rem;
+      color: #6c757d;
+    }
+
+    .filter-container {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      justify-content: flex-end;
+    }
+
+    .filter-button {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      background: var(--white);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-button.active {
+      background: var(--primary);
+      color: var(--white);
+      border-color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
+      <div class="navbar-menu">
+        <a href="/" class="navbar-link">Início</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Histórico de Transações</h1>
+      <p class="page-subtitle">Acompanhe todas as suas transações de moedas</p>
+    </div>
+
+    <div class="filter-container">
+      <button class="filter-button active" data-filter="todas">Todas</button>
+      <button class="filter-button" data-filter="ganhos">Ganhos</button>
+      <button class="filter-button" data-filter="gastos">Gastos</button>
+    </div>
+
+    <div class="transactions-container" id="transactionsList">
+      <!-- As transações serão inseridas aqui via JavaScript -->
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadTransactions();
+      setupFilterButtons();
+    });
+
+    async function loadTransactions() {
+      try {
+        const response = await fetch('/transacoes/exibir-transacoes/dados');
+        if (!response.ok) {
+          throw new Error('Erro ao carregar transações');
+        }
+
+        const transacoes = await response.json();
+        displayTransactions(transacoes);
+      } catch (error) {
+        console.error('Erro:', error);
+        document.getElementById('transactionsList').innerHTML = `
+          <div class="no-transactions">
+            <p>Erro ao carregar transações. Por favor, tente novamente mais tarde.</p>
+          </div>
+        `;
+      }
+    }
+
+    function displayTransactions(transacoes) {
+      const container = document.getElementById('transactionsList');
+      if (!transacoes || transacoes.length === 0) {
+        container.innerHTML = `
+          <div class="no-transactions">
+            <p>Nenhuma transação encontrada.</p>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = transacoes.map(transacao => {
+        const isGain = transacao.tipo === 'GANHO' || transacao.tipo === 'ENVIO_PROFESSOR';
+        const icon = isGain ? '↓' : '↑';
+        const iconClass = isGain ? 'transaction-gain' : 'transaction-loss';
+        const amountClass = isGain ? 'amount-gain' : 'amount-loss';
+        const amountPrefix = isGain ? '+' : '-';
+        
+        return `
+          <div class="transaction-item" data-type="${isGain ? 'ganho' : 'gasto'}">
+            <div class="transaction-icon ${iconClass}">${icon}</div>
+            <div class="transaction-details">
+              <div class="transaction-title">${getTipoTransacao(transacao.tipo)}</div>
+              <div class="transaction-description">${transacao.mensagem || 'Sem descrição'}</div>
+            </div>
+            <span class="transaction-amount ${amountClass}">${amountPrefix}${transacao.quantidade} moedas</span>
+            <span class="transaction-date">${formatDate(transacao.data_criacao)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function getTipoTransacao(tipo) {
+      const tipos = {
+        'GANHO': 'Recebimento de Moedas',
+        'GASTO': 'Gasto de Moedas',
+        'ENVIO_PROFESSOR': 'Recebido do Professor',
+        'COMPRA_VANTAGEM': 'Compra de Vantagem'
+      };
+      return tipos[tipo] || tipo;
+    }
+
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function setupFilterButtons() {
+      const buttons = document.querySelectorAll('.filter-button');
+      
+      buttons.forEach(button => {
+        button.addEventListener('click', () => {
+          // Remove active class from all buttons
+          buttons.forEach(btn => btn.classList.remove('active'));
+          // Add active class to clicked button
+          button.classList.add('active');
+          
+          const filter = button.dataset.filter;
+          filterTransactions(filter);
+        });
+      });
+    }
+
+    function filterTransactions(filter) {
+      const items = document.querySelectorAll('.transaction-item');
+      
+      items.forEach(item => {
+        if (filter === 'todas') {
+          item.style.display = 'flex';
+        } else if (filter === 'ganhos' && item.dataset.type === 'ganho') {
+          item.style.display = 'flex';
+        } else if (filter === 'gastos' && item.dataset.type === 'gasto') {
+          item.style.display = 'flex';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html> 

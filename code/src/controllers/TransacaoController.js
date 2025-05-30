@@ -150,6 +150,46 @@ class TransacaoController {
             return res.status(500).json({ erro: 'Erro ao excluir transação.' });
         }
     }
+
+    static async renderTransacoes(req, res){
+        if (!req.session.userId) {
+            return res.redirect('/usuario/login');
+        }
+        const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+        if (usuario.tipo == 'empresa'){
+            return res.redirect('/usuario/login');
+        }
+        res.render('historico-transacoes')
+    }
+
+    static async listarHistorico(req, res) {
+        if (!req.session.userId) {
+          return res.status(401).json({ erro: 'Usuário não autenticado' });
+        }
+        
+        try {
+          const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+          if (!usuario) {
+            return res.status(403).json({ erro: 'Usuário não encontrado' });
+          }
+          
+          // Busca transações onde o usuário é origem ou destino
+          const transacoes = await TransacaoModel.buscarPorUsuario(req.session.userId);
+          // Formata as transações para identificar ganhos e gastos
+          const transacoesFormatadas = transacoes.map(transacao => {
+            const isOrigem = transacao.origem_id === req.session.userId;
+            return {
+              ...transacao,
+              tipo: isOrigem ? 'GASTO' : 'GANHO'
+            };
+          });
+          
+          res.json(transacoesFormatadas);
+        } catch (error) {
+          console.error('Erro ao listar histórico:', error);
+          res.status(500).json({ erro: 'Erro ao buscar histórico de transações' });
+        }
+      }
 }
 
 module.exports = TransacaoController; 
