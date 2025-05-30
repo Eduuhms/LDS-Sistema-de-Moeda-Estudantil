@@ -183,6 +183,7 @@ class TransacaoController {
               tipo: isOrigem ? 'GASTO' : 'GANHO'
             };
           });
+          console.log(transacoesFormatadas)
           
           res.json(transacoesFormatadas);
         } catch (error) {

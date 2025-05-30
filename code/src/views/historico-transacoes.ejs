@@ -266,10 +266,16 @@
             <div class="transaction-icon ${iconClass}">${icon}</div>
             <div class="transaction-details">
               <div class="transaction-title">${getTipoTransacao(transacao.tipo)}</div>
-              <div class="transaction-description">${transacao.mensagem || 'Sem descrição'}</div>
+              <div class="transaction-description">
+                ${transacao.mensagem || 'Sem descrição'}
+                <br>
+                <small class="text-muted">
+                  ${isGain ? 'Recebido de: ' + transacao.nome_origem : 'Enviado para: ' + transacao.nome_destino}
+                </small>
+              </div>
             </div>
             <span class="transaction-amount ${amountClass}">${amountPrefix}${transacao.quantidade} moedas</span>
-            <span class="transaction-date">${formatDate(transacao.data_criacao)}</span>
+            <span class="transaction-date">${formatDate(transacao.created_at)}</span>
           </div>
         `;
       }).join('');
