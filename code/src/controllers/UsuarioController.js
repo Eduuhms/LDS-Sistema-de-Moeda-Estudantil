@@ -62,7 +62,8 @@ class UsuarioController {
                     ...userData,
                     cpf: professor.cpf,
                     departamento: professor.departamento,
-                    instituicao: instituicao?.nome
+                    instituicao: instituicao?.nome,
+                    saldo: professor.saldo
                 };
             } else if (usuario.tipo === 'empresa') {
                 const empresa = await EmpresaModel.buscarPorUsuarioId(usuario.id);

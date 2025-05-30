@@ -8,6 +8,24 @@ class ProfessorController {
     res.render('professores/cadastro');
   }
 
+  static async renderEnviarMoedas(req, res) {
+    if (!req.session.userId) {
+      return res.redirect('/usuario/login');
+    }
+    
+    try {
+      const usuario = await UsuarioModel.buscarPorId(req.session.userId);
+      if (!usuario || usuario.tipo !== 'professor') {
+        return res.status(403).render('error', { erro: 'Acesso negado. Apenas professores podem acessar esta página.' });
+      }
+      
+      res.render('professor/enviar-moedas');
+    } catch (error) {
+      console.error('Erro ao renderizar página de envio de moedas:', error);
+      res.status(500).render('error', { erro: 'Erro ao carregar página de envio de moedas' });
+    }
+  }
+
   static async listar(req, res) {
     try {
       const professores = await ProfessorModel.listar();

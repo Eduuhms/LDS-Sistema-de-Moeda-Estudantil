@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enviar Moedas - Sistema de Moeda Estudantil</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-dark: #3a56d4;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+      --white: #ffffff;
+      --border: #e9ecef;
+      --gold: #ffd700;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--dark);
+      background-color: var(--light);
+      min-height: 100vh;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: var(--white);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .navbar-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .navbar-menu {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+    }
+
+    .navbar-link {
+      color: var(--dark);
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background-color 0.2s;
+    }
+
+    .navbar-link:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      right: 0;
+      background-color: var(--white);
+      min-width: 200px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 0.5rem;
+      z-index: 1001;
+    }
+
+    .dropdown-content a {
+      color: var(--dark);
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      transition: background-color 0.2s;
+    }
+
+    .dropdown-content a:hover {
+      background-color: var(--light);
+    }
+
+    .dropdown.show .dropdown-content {
+      display: block;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .user-avatar:hover {
+      background-color: var(--primary-dark);
+    }
+
+    /* Main Content */
+    .main-container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem 1rem;
+    }
+
+    .page-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #6c757d;
+    }
+
+    /* Form */
+    .form-container {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .search-container {
+      position: relative;
+      margin-bottom: 1rem;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      padding-left: 2.5rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6c757d;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
+    }
+
+    .select-container {
+      position: relative;
+    }
+
+    .select-container select {
+      width: 100%;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.25);
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-dark);
+    }
+
+    .btn-secondary {
+      background-color: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background-color: #5a6268;
+    }
+
+    /* Alert */
+    .alert {
+      padding: 1rem;
+      margin-bottom: 1rem;
+      border-radius: 4px;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: #d4edda;
+      border: 1px solid #c3e6cb;
+      color: #155724;
+    }
+
+    .alert-danger {
+      background-color: #f8d7da;
+      border: 1px solid #f5c6cb;
+      color: #721c24;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    /* Saldo */
+    .saldo-container {
+      background: linear-gradient(135deg, var(--gold), #ffed4e);
+      color: var(--dark);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+      .navbar-menu {
+        gap: 1rem;
+      }
+      
+      .saldo-container {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-container">
+      <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
+      <div class="navbar-menu">
+        <a href="/" class="navbar-link">Início</a>
+        <div class="saldo-container">
+          <span class="coin-icon">🪙</span>
+          <span id="saldoDisplay">0 moedas</span>
+        </div>
+        <div class="dropdown">
+          <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">P</div>
+          <div class="dropdown-content" id="dropdownContent">
+            <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
+            <a href="/usuario/logout">Sair</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="main-container">
+    <div class="page-header">
+      <h1 class="page-title">Enviar Moedas</h1>
+      <p class="page-subtitle">Reconheça o bom desempenho dos alunos enviando moedas</p>
+    </div>
+
+    <!-- Alerts -->
+    <div id="alertSuccess" class="alert alert-success">
+      <span id="alertSuccessMessage"></span>
+    </div>
+    <div id="alertError" class="alert alert-danger">
+      <span id="alertErrorMessage"></span>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+      <form id="enviarMoedasForm">
+        <div class="form-group">
+          <label class="form-label" for="pesquisaAluno">Pesquisar Aluno</label>
+          <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" class="search-input" id="pesquisaAluno" placeholder="Digite o nome do aluno...">
+          </div>
+          <div class="select-container">
+            <label class="form-label" for="alunoSelect">Aluno</label>
+            <select class="form-control" id="alunoSelect" required size="5">
+              <option value="">Selecione um aluno</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="quantidade">Quantidade de Moedas</label>
+          <input type="number" class="form-control" id="quantidade" min="1" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="mensagem">Mensagem (opcional)</label>
+          <textarea class="form-control" id="mensagem" placeholder="Explique o motivo do envio das moedas..."></textarea>
+        </div>
+
+        <div class="form-group" style="text-align: right;">
+          <button type="button" class="btn btn-secondary" onclick="window.location.href='/'">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Enviar Moedas</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+    let todosAlunos = []; // Array para armazenar todos os alunos
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadUserData();
+      loadAlunos();
+    });
+
+    // Carrega dados do usuário
+    async function loadUserData() {
+      try {
+        const response = await fetch('/usuario/user-data');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar dados do usuário');
+        }
+        
+        currentUser = await response.json();
+        
+        // Atualiza UI com dados do usuário
+        const userAvatar = document.getElementById('userAvatar');
+        const saldoDisplay = document.getElementById('saldoDisplay');
+        
+        if (currentUser.nome) {
+          userAvatar.textContent = currentUser.nome.charAt(0).toUpperCase();
+        }
+        console.log(currentUser);
+        
+        if (currentUser.saldo !== undefined) {
+          saldoDisplay.textContent = `${currentUser.saldo} moedas`;
+        }
+        
+      } catch (error) {
+        console.error('Erro ao carregar dados do usuário:', error);
+        window.location.href = '/usuario/login';
+      }
+    }
+
+    // Carrega lista de alunos
+    async function loadAlunos() {
+      try {
+        const response = await fetch('/alunos/');
+        
+        if (!response.ok) {
+          throw new Error('Erro ao carregar lista de alunos');
+        }
+        
+        todosAlunos = await response.json(); // Armazena todos os alunos
+        filtrarEExibirAlunos(''); // Exibe todos os alunos inicialmente
+        
+      } catch (error) {
+        console.error('Erro ao carregar alunos:', error);
+        showAlert('Erro ao carregar lista de alunos', 'danger');
+      }
+    }
+
+    // Função para filtrar e exibir alunos
+    function filtrarEExibirAlunos(termoPesquisa) {
+      const alunoSelect = document.getElementById('alunoSelect');
+      alunoSelect.innerHTML = '<option value="">Selecione um aluno</option>';
+      
+      const alunosFiltrados = todosAlunos.filter(aluno => 
+        aluno.nome.toLowerCase().includes(termoPesquisa.toLowerCase())
+      );
+      
+      alunosFiltrados.forEach(aluno => {
+        const option = document.createElement('option');
+        option.value = aluno.usuario_id;
+        option.textContent = `${aluno.nome} - ${aluno.curso}`;
+        alunoSelect.appendChild(option);
+      });
+    }
+
+    // Adiciona evento de pesquisa
+    document.getElementById('pesquisaAluno').addEventListener('input', function(e) {
+      filtrarEExibirAlunos(e.target.value);
+    });
+
+    // Submit do formulário
+    document.getElementById('enviarMoedasForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const alunoId = document.getElementById('alunoSelect').value;
+      const quantidade = parseInt(document.getElementById('quantidade').value);
+      const mensagem = document.getElementById('mensagem').value;
+      
+      if (!alunoId || !quantidade || quantidade < 1) {
+        showAlert('Por favor, preencha todos os campos obrigatórios corretamente', 'danger');
+        return;
+      }
+      
+      try {
+        // Busca o ID do professor
+        const professorResponse = await fetch(`/professores/usuario/${currentUser.id}`);
+        if (!professorResponse.ok) {
+          throw new Error('Erro ao buscar dados do professor');
+        }
+        const professorData = await professorResponse.json();
+        
+        // Cria a transação
+        const response = await fetch('/transacoes/cadastrar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            quantidade,
+            mensagem,
+            origemId: currentUser.id,
+            destinoId: alunoId,
+            tipoTransacao: 'ENVIO_PROFESSOR'
+          })
+        });
+        
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.erro || 'Erro ao enviar moedas');
+        }
+        
+        showAlert('Moedas enviadas com sucesso!', 'success');
+        document.getElementById('enviarMoedasForm').reset();
+        loadUserData(); // Atualiza o saldo
+        
+      } catch (error) {
+        console.error('Erro ao enviar moedas:', error);
+        showAlert(error.message, 'danger');
+      }
+    });
+
+    // Funções do dropdown
+    function toggleDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function closeDropdown() {
+      const dropdown = document.querySelector('.dropdown');
+      dropdown.classList.remove('show');
+    }
+
+    // Mostra alert
+    function showAlert(message, type) {
+      const alertId = type === 'success' ? 'alertSuccess' : 'alertError';
+      const messageId = type === 'success' ? 'alertSuccessMessage' : 'alertErrorMessage';
+      
+      document.getElementById(messageId).textContent = message;
+      document.getElementById(alertId).classList.add('show');
+      
+      setTimeout(() => {
+        document.getElementById(alertId).classList.remove('show');
+      }, 5000);
+    }
+
+    // Fecha dropdown quando clica fora
+    document.addEventListener('click', function(event) {
+      const dropdown = document.querySelector('.dropdown');
+      
+      if (!dropdown.contains(event.target)) {
+        dropdown.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html> 
