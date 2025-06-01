@@ -1,22 +1,27 @@
 const ProfessorModel = require('../models/ProfessorModel');
 const cron = require('node-cron');
-const logger = require('../config/logger'); // Se tiver um sistema de logs
+const logger = require('../config/logger');
 
 class MoedasCron {
   static init() {
-    // Agendando para rodar no primeiro dia de cada mês às 00:00
-    cron.schedule('0 0 1 * *', this.executarAdicaoDeMoedas);
+    // Agendando para rodar no primeiro dia de Janeiro e Julho às 00:00
+    cron.schedule('0 0 1 1,7 *', this.executarAdicaoDeMoedas);
     
-    logger.info('Agendador de moedas mensais iniciado...');
+    logger.info('Agendador de moedas semestrais iniciado...');
   }
 
   static async executarAdicaoDeMoedas() {
     try {
-      logger.info('Executando tarefa mensal de adição de moedas...');
+      const now = new Date();
+      const semestre = Math.ceil((now.getMonth() + 1) / 6); // 1 ou 2
+      
+      logger.info(`Iniciando adição semestral de moedas (Semestre ${semestre} de ${now.getFullYear()})...`);
+      
       await ProfessorModel.adicionarSaldoATodos(1000);
-      logger.info('Moedas adicionadas com sucesso a todos os professores.');
+      
+      logger.info(`Moedas do semestre ${semestre} adicionadas com sucesso a todos os professores.`);
     } catch (error) {
-      logger.error('Erro ao adicionar moedas:', error);
+      logger.error('Erro ao adicionar moedas semestrais:', error);
     }
   }
 }
