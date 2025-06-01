@@ -75,6 +75,12 @@ class ProfessorModel extends UsuarioModel {
       [novoSaldo, id]
     );
   }
+  static async adicionarSaldoATodos(valor) {
+  await db.query(
+    'UPDATE professores SET saldo = saldo + ?, updated_at = CURRENT_TIMESTAMP',
+    [valor]
+  );
+}
 }
 
 module.exports = ProfessorModel;
