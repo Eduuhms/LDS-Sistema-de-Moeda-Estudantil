@@ -18,6 +18,12 @@ app.use(session({
   cookie: { secure: false } // Defina como true se estiver usando HTTPS
 }));
 
+// Após todas as inicializações do servidor
+if (process.env.NODE_ENV !== 'test') {
+  const MoedasCron = require('./src/tasks/moedasCron');
+  MoedasCron.init();
+}
+
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

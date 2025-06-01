@@ -10,5 +10,6 @@ router.get('/:id', ProfessorController.buscarPorId);
 router.put('/atualizar/:id', ProfessorController.atualizar);
 router.delete('/:id', ProfessorController.excluir);
 router.get('/usuario/:usuarioId', ProfessorController.buscarPorUsuarioId);
+router.post('/professores/adicionar-moedas-mensais', ProfessorController.adicionarMoedasMensais);
 
 module.exports = router;

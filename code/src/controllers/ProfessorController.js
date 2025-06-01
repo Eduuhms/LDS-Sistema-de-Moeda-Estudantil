@@ -278,6 +278,21 @@ class ProfessorController {
         return res.status(500).json({ erro: 'Falha ao buscar professor. Por favor, tente novamente mais tarde.' });
     }
 }
+
+static async adicionarMoedasMensais(req, res) {
+  try {
+    // Verifica se o usuário é admin (adicione sua lógica de autenticação aqui)
+    if (!req.session.userId || req.session.userType !== 'admin') {
+      return res.status(403).json({ erro: 'Acesso negado. Apenas administradores podem executar esta ação.' });
+    }
+
+    await ProfessorModel.adicionarSaldoATodos(1000);
+    return res.status(200).json({ mensagem: '1000 moedas adicionadas a todos os professores com sucesso.' });
+  } catch (error) {
+    console.error('Erro ao adicionar moedas mensais:', error);
+    return res.status(500).json({ erro: 'Erro ao adicionar moedas mensais.' });
+  }
+}
 }
 
 module.exports = ProfessorController;
