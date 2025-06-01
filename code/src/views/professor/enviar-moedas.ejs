@@ -386,6 +386,21 @@
     document.addEventListener('DOMContentLoaded', function() {
       loadUserData();
       loadAlunos();
+
+        // Adiciona validação em tempo real para o campo de quantidade
+  document.getElementById('quantidade').addEventListener('input', function(e) {
+    const quantidade = parseInt(e.target.value) || 0;
+    const saldo = currentUser?.saldo || 0;
+    
+    if (quantidade > saldo) {
+      e.target.setCustomValidity('Saldo insuficiente');
+      showAlert('Você não tem saldo suficiente para esta transação', 'danger');
+    } else {
+      e.target.setCustomValidity('');
+      // Esconde o alerta se o valor for válido
+      document.getElementById('alertError').classList.remove('show');
+    }
+  });
     });
 
     // Carrega dados do usuário
@@ -458,56 +473,62 @@
       filtrarEExibirAlunos(e.target.value);
     });
 
-    // Submit do formulário
-    document.getElementById('enviarMoedasForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const alunoId = document.getElementById('alunoSelect').value;
-      const quantidade = parseInt(document.getElementById('quantidade').value);
-      const mensagem = document.getElementById('mensagem').value;
-      
-      if (!alunoId || !quantidade || quantidade < 1) {
-        showAlert('Por favor, preencha todos os campos obrigatórios corretamente', 'danger');
-        return;
-      }
-      
-      try {
-        // Busca o ID do professor
-        const professorResponse = await fetch(`/professores/usuario/${currentUser.id}`);
-        if (!professorResponse.ok) {
-          throw new Error('Erro ao buscar dados do professor');
-        }
-        const professorData = await professorResponse.json();
-        
-        // Cria a transação
-        const response = await fetch('/transacoes/cadastrar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            quantidade,
-            mensagem,
-            origemId: currentUser.id,
-            destinoId: alunoId,
-            tipoTransacao: 'ENVIO_PROFESSOR'
-          })
-        });
-        
-        if (!response.ok) {
-          const error = await response.json();
-          throw new Error(error.erro || 'Erro ao enviar moedas');
-        }
-        
-        showAlert('Moedas enviadas com sucesso!', 'success');
-        document.getElementById('enviarMoedasForm').reset();
-        loadUserData(); // Atualiza o saldo
-        
-      } catch (error) {
-        console.error('Erro ao enviar moedas:', error);
-        showAlert(error.message, 'danger');
-      }
+// Submit do formulário
+document.getElementById('enviarMoedasForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const alunoId = document.getElementById('alunoSelect').value;
+  const quantidade = parseInt(document.getElementById('quantidade').value);
+  const mensagem = document.getElementById('mensagem').value;
+  
+  if (!alunoId || !quantidade || quantidade < 1) {
+    showAlert('Por favor, preencha todos os campos obrigatórios corretamente', 'danger');
+    return;
+  }
+  
+  // Verifica se o professor tem saldo suficiente
+  if (quantidade > currentUser.saldo) {
+    showAlert('Saldo insuficiente. Você não tem moedas suficientes para realizar esta transação.', 'danger');
+    return;
+  }
+  
+  try {
+    // Busca o ID do professor
+    const professorResponse = await fetch(`/professores/usuario/${currentUser.id}`);
+    if (!professorResponse.ok) {
+      throw new Error('Erro ao buscar dados do professor');
+    }
+    const professorData = await professorResponse.json();
+    
+    // Cria a transação
+    const response = await fetch('/transacoes/cadastrar', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        quantidade,
+        mensagem,
+        origemId: currentUser.id,
+        destinoId: alunoId,
+        tipoTransacao: 'ENVIO_PROFESSOR'
+      })
     });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.erro || 'Erro ao enviar moedas');
+    }
+    
+    showAlert('Moedas enviadas com sucesso!', 'success');
+    document.getElementById('enviarMoedasForm').reset();
+    loadUserData(); // Atualiza o saldo
+    
+  } catch (error) {
+    console.error('Erro ao enviar moedas:', error);
+    showAlert(error.message, 'danger');
+  }
+});
 
     // Funções do dropdown
     function toggleDropdown() {
