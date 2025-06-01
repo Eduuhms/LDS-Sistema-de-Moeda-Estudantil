@@ -28,60 +28,75 @@ class TransacaoController {
         }
     }
 
-    static async criar(req, res) {
-        try {
-            const {quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
-            if (!quantidade || !origemId || !destinoId || !tipoTransacao) {
-                return res.status(400).json({ erro: 'Campos obrigatórios: quantidade, origemId, destinoId, tipoTransacao' });
-            }
-            const id = await TransacaoModel.criar({quantidade, mensagem, origemId, destinoId, tipoTransacao });
-            const transacao = await TransacaoModel.buscarPorId(id);
-            
-            var usuarioOrigemDados, usuarioDestinoDados;
-
-            // Atualiza dados do usuario de origem 
-            const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
-            if (usuarioOrigem.tipo != 'empresa'){
-                if (usuarioOrigem.tipo == 'professor') {
-                    usuarioOrigemDados = await ProfessorModel.buscarPorUsuarioId(origemId);
-                } else if (usuarioOrigem.tipo == 'aluno') {
-                    usuarioOrigemDados = await AlunoModel.buscarPorUsuarioId(origemId);
-                }
-                // console.log(usuarioOrigemDados)
-                usuarioOrigemDados.saldo -= quantidade;
-
-                if (usuarioOrigem.tipo == 'professor') {
-                    usuarioOrigemDados = await ProfessorModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
-                } else if (usuarioOrigem.tipo == 'aluno') {
-                    usuarioOrigemDados = await AlunoModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
-                }
-            }
-
-            // Atualizando dados do usuario de destino
-            const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
-            if (usuarioDestino.tipo != 'empresa'){
-                if (usuarioDestino.tipo == 'professor') {
-                    usuarioDestinoDados = await ProfessorModel.buscarPorUsuarioId(destinoId);
-                } else if (usuarioDestino.tipo == 'aluno') {
-                    usuarioDestinoDados = await AlunoModel.buscarPorUsuarioId(destinoId);
-                }
-                console.log(quantidade)
-                usuarioDestinoDados.saldo += quantidade;
-                console.log(usuarioDestinoDados)
-
-                if (usuarioDestino.tipo == 'professor') {
-                    usuarioDestinoDados = await ProfessorModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
-                } else if (usuarioDestino.tipo == 'aluno') {
-                    usuarioDestinoDados = await AlunoModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
-                }
-            }
-            
-            return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
-        } catch (error) {
-            console.log(error)
-            return res.status(500).json({ erro: 'Erro ao criar transação.' });
+static async criar(req, res) {
+    try {
+        const {quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
+        
+        // Garantir que quantidade seja tratada como número
+        const quantidadeNum = parseFloat(quantidade);
+        
+        if (!quantidade || !origemId || !destinoId || !tipoTransacao || isNaN(quantidadeNum)) {
+            return res.status(400).json({ erro: 'Campos obrigatórios: quantidade (numérica), origemId, destinoId, tipoTransacao' });
         }
+
+        const id = await TransacaoModel.criar({
+            quantidade: quantidadeNum, 
+            mensagem, 
+            origemId, 
+            destinoId, 
+            tipoTransacao 
+        });
+        
+        const transacao = await TransacaoModel.buscarPorId(id);
+        
+        // Atualiza dados do usuario de origem 
+        const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
+        if (usuarioOrigem.tipo != 'empresa'){
+            let usuarioOrigemDados;
+            if (usuarioOrigem.tipo == 'professor') {
+                usuarioOrigemDados = await ProfessorModel.buscarPorUsuarioId(origemId);
+            } else if (usuarioOrigem.tipo == 'aluno') {
+                usuarioOrigemDados = await AlunoModel.buscarPorUsuarioId(origemId);
+            }
+            
+            // Garantir que o saldo atual seja tratado como número
+            usuarioOrigemDados.saldo = parseFloat(usuarioOrigemDados.saldo || 0);
+            usuarioOrigemDados.saldo -= quantidadeNum;
+
+            if (usuarioOrigem.tipo == 'professor') {
+                await ProfessorModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
+            } else if (usuarioOrigem.tipo == 'aluno') {
+                await AlunoModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
+            }
+        }
+
+        // Atualizando dados do usuario de destino
+        const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
+        if (usuarioDestino.tipo != 'empresa'){
+            let usuarioDestinoDados;
+            if (usuarioDestino.tipo == 'professor') {
+                usuarioDestinoDados = await ProfessorModel.buscarPorUsuarioId(destinoId);
+            } else if (usuarioDestino.tipo == 'aluno') {
+                usuarioDestinoDados = await AlunoModel.buscarPorUsuarioId(destinoId);
+            }
+            
+            // Garantir que o saldo atual seja tratado como número
+            usuarioDestinoDados.saldo = parseFloat(usuarioDestinoDados.saldo || 0);
+            usuarioDestinoDados.saldo += quantidadeNum;
+
+            if (usuarioDestino.tipo == 'professor') {
+                await ProfessorModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
+            } else if (usuarioDestino.tipo == 'aluno') {
+                await AlunoModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
+            }
+        }
+        
+        return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
+    } catch (error) {
+        console.error('Erro ao criar transação:', error);
+        return res.status(500).json({ erro: 'Erro ao criar transação.' });
     }
+}
 
     static async atualizar(req, res) {
         try {
