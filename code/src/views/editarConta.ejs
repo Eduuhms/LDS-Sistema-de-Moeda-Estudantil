@@ -304,7 +304,7 @@
             let userId = null;
 
             // Carrega os dados do usuário
-            fetch('/user-data')
+            fetch('user-data')
                 .then(response => response.json())
                 .then(user => {
                     currentUser = user;
