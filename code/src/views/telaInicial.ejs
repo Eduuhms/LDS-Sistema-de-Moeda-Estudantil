@@ -294,6 +294,22 @@
       color: var(--dark);
     }
 
+    .saldo-container {
+      background: linear-gradient(135deg, var(--gold), #ffed4e);
+      color: var(--dark);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Adicione também a variável gold no :root */
+    :root {
+      --gold: #ffd700;
+    }
+
     @media (max-width: 768px) {
       .navbar-menu {
         gap: 1rem;
@@ -323,19 +339,22 @@
     <div class="navbar-container">
       <a href="/" class="navbar-brand">Sistema Moeda Estudantil</a>
       <div class="navbar-menu">
+        <div class="saldo-container" id="saldoContainer">
+          <span class="coin-icon">🪙</span>
+          <span id="saldoDisplay">0 moedas</span>
+        </div>
         <div class="dropdown">
           <div class="user-avatar" id="userAvatar" onclick="toggleDropdown()">E</div>
           <div class="dropdown-content" id="dropdownContent">
             <a href="#" onclick="openAccountModal(); closeDropdown();">Ver Informações da Conta</a>
-             <a href="/usuario/editar-conta" onclick="closeDropdown();">Editar Conta</a>
-             <a href="#" onclick="openDeleteModal(); closeDropdown();">Excluir Conta</a>
+            <a href="/usuario/editar-conta" onclick="closeDropdown();">Editar Conta</a>
+            <a href="#" onclick="openDeleteModal(); closeDropdown();">Excluir Conta</a>
             <a href="/usuario/logout">Sair</a>
           </div>
         </div>
       </div>
     </div>
   </nav>
-
   <!-- Main Content -->
   <div class="main-container">
     <!-- Welcome Section -->
@@ -466,11 +485,24 @@
       const welcomeTitle = document.getElementById('welcomeTitle');
       const welcomeSubtitle = document.getElementById('welcomeSubtitle');
       const userAvatar = document.getElementById('userAvatar');
+      const saldoDisplay = document.getElementById('saldoDisplay');
+      const saldoContainer = document.getElementById('saldoContainer');
 
       // Atualiza avatar com primeira letra do nome
       if (user.nome) {
         userAvatar.textContent = user.nome.charAt(0).toUpperCase();
       }
+
+  // Esconde o saldo se for empresa
+  if (user.tipo === 'empresa') {
+    saldoContainer.style.display = 'none';
+  } else {
+    saldoContainer.style.display = 'flex'; // ou 'inline-flex' dependendo do seu layout
+    // Atualiza saldo se existir
+    if (user.saldo !== undefined) {
+      saldoDisplay.textContent = `${user.saldo} moedas`;
+    }
+  }
 
       // Mensagem personalizada conforme o tipo de usuário
       if (user.tipo === 'empresa') {
@@ -583,56 +615,56 @@
       document.getElementById('deleteModal').style.display = 'none';
     }
 
-function confirmDelete() {
-  let fetchUrl = '';
-  let deleteUrl = '';
+    function confirmDelete() {
+      let fetchUrl = '';
+      let deleteUrl = '';
 
-  if (currentUser.tipo === 'aluno') {
-    fetchUrl = `/alunos/usuario/${currentUser.id}`;
-  } else if (currentUser.tipo === 'professor') {
-    fetchUrl = `/professores/usuario/${currentUser.id}`;
-  } else if (currentUser.tipo === 'empresa') {
-    fetchUrl = `/empresas/usuario/${currentUser.id}`;
-  }
-
-  // Primeiro busca o ID específico do recurso associado ao usuário
-  fetch(fetchUrl)
-    .then(response => response.json())
-    .then(data => {
-      if (!data || !data.id) {
-        throw new Error(`${currentUser.tipo.charAt(0).toUpperCase() + currentUser.tipo.slice(1)} não encontrado(a)`);
-      }
-
-      // Monta a URL para deletar usando o ID encontrado
       if (currentUser.tipo === 'aluno') {
-        deleteUrl = `/alunos/${data.id}`;
+        fetchUrl = `/alunos/usuario/${currentUser.id}`;
       } else if (currentUser.tipo === 'professor') {
-        deleteUrl = `/professores/${data.id}`;
+        fetchUrl = `/professores/usuario/${currentUser.id}`;
       } else if (currentUser.tipo === 'empresa') {
-        deleteUrl = `/empresas/${data.id}`;
+        fetchUrl = `/empresas/usuario/${currentUser.id}`;
       }
 
-      // Agora envia o DELETE para o endpoint correto
-      return fetch(deleteUrl, {
-        method: 'DELETE'
-      });
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Erro ao excluir conta');
-      }
-      return response.json();
-    })
-    .then(data => {
-      alert('Conta excluída com sucesso!');
-      window.location.href = '/usuario/logout';
-    })
-    .catch(error => {
-      console.error('Erro:', error);
-      alert('Ocorreu um erro ao excluir a conta');
-      closeDeleteModal();
-    });
-}
+      // Primeiro busca o ID específico do recurso associado ao usuário
+      fetch(fetchUrl)
+        .then(response => response.json())
+        .then(data => {
+          if (!data || !data.id) {
+            throw new Error(`${currentUser.tipo.charAt(0).toUpperCase() + currentUser.tipo.slice(1)} não encontrado(a)`);
+          }
+
+          // Monta a URL para deletar usando o ID encontrado
+          if (currentUser.tipo === 'aluno') {
+            deleteUrl = `/alunos/${data.id}`;
+          } else if (currentUser.tipo === 'professor') {
+            deleteUrl = `/professores/${data.id}`;
+          } else if (currentUser.tipo === 'empresa') {
+            deleteUrl = `/empresas/${data.id}`;
+          }
+
+          // Agora envia o DELETE para o endpoint correto
+          return fetch(deleteUrl, {
+            method: 'DELETE'
+          });
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Erro ao excluir conta');
+          }
+          return response.json();
+        })
+        .then(data => {
+          alert('Conta excluída com sucesso!');
+          window.location.href = '/usuario/logout';
+        })
+        .catch(error => {
+          console.error('Erro:', error);
+          alert('Ocorreu um erro ao excluir a conta');
+          closeDeleteModal();
+        });
+    }
   </script>
   <!-- Modal de confirmação de exclusão -->
   <div id="deleteModal" class="modal">
