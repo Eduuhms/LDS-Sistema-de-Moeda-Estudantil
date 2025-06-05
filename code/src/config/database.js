@@ -1,4 +1,4 @@
-const mysql = require('mysql2/promise'); // Note o /promise
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const pool = mysql.createPool({
@@ -27,14 +27,14 @@ const initDb = async () => {
         )
       `);
 
-    // Tabela de usuários
+    // Tabela de usuários - Adicionando 'instituicao' ao ENUM
     await pool.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
           id INT AUTO_INCREMENT PRIMARY KEY,
           nome VARCHAR(100) NOT NULL,
           email VARCHAR(100) NOT NULL UNIQUE,
           senha VARCHAR(255) NOT NULL,
-          tipo ENUM('empresa', 'professor', 'aluno') DEFAULT 'aluno',
+          tipo ENUM('empresa', 'professor', 'aluno', 'instituicao') DEFAULT 'aluno',
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )
@@ -74,7 +74,7 @@ const initDb = async () => {
         )
       `);
 
-    // Adicione isso na função initDb(), após a criação das outras tabelas
+    // Tabela de professores
     await pool.query(`
   CREATE TABLE IF NOT EXISTS professores (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,8 +90,8 @@ const initDb = async () => {
   )
 `);
 
-      await pool.query(
-        `CREATE TABLE IF NOT EXISTS transacoes (
+    await pool.query(
+      `CREATE TABLE IF NOT EXISTS transacoes (
       id INT AUTO_INCREMENT PRIMARY KEY,
       quantidade DECIMAL(10,2) NOT NULL,
       mensagem TEXT,
@@ -117,7 +117,34 @@ const initDb = async () => {
           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
           FOREIGN KEY (empresa_id) REFERENCES empresas(id) ON DELETE CASCADE
         )
-      `)
+      `);
+
+    // Verificar se o usuário instituição já existe
+    const [userRows] = await pool.query('SELECT * FROM usuarios WHERE email = ?', ['instituicao@gmail.com']);
+    
+    if (userRows.length === 0) {
+      // Criar usuário instituição
+      const [result] = await pool.query(
+        'INSERT INTO usuarios (nome, email, senha, tipo) VALUES (?, ?, ?, ?)',
+        ['Instituicao de Ensino', 'instituicao@gmail.com', '123456', 'instituicao']
+      );
+      const userId = result.insertId;
+
+      // Criar registro na tabela instituicoes_ensino
+      await pool.query(
+        `INSERT INTO instituicoes_ensino 
+        (nome, endereco, cnpj, telefone) 
+        VALUES (?, ?, ?, ?)`,
+        [
+          'PUC Minas', 
+          'Endereço da Instituição', 
+          '00.000.000/0000-00', 
+          '(00) 0000-0000'
+        ]
+      );
+
+      console.log('Usuário instituição e registro na tabela instituicoes_ensino criados com sucesso');
+    }
 
     console.log('Banco de dados inicializado com sucesso');
   } catch (error) {
