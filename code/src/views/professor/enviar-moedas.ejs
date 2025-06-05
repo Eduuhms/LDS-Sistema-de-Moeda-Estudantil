@@ -367,7 +367,7 @@
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="mensagem">Mensagem (opcional)</label>
+          <label class="form-label" for="mensagem">Mensagem</label>
           <textarea class="form-control" id="mensagem" placeholder="Explique o motivo do envio das moedas..."></textarea>
         </div>
 
@@ -481,7 +481,7 @@ document.getElementById('enviarMoedasForm').addEventListener('submit', async fun
   const quantidade = parseInt(document.getElementById('quantidade').value);
   const mensagem = document.getElementById('mensagem').value;
   
-  if (!alunoId || !quantidade || quantidade < 1) {
+  if (!alunoId || !quantidade || quantidade < 1 || !mensagem) {
     showAlert('Por favor, preencha todos os campos obrigatórios corretamente', 'danger');
     return;
   }

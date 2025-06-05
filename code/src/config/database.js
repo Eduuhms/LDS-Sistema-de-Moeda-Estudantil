@@ -94,7 +94,7 @@ const initDb = async () => {
       `CREATE TABLE IF NOT EXISTS transacoes (
       id INT AUTO_INCREMENT PRIMARY KEY,
       quantidade DECIMAL(10,2) NOT NULL,
-      mensagem TEXT,
+      mensagem TEXT NOT NULL,
       origem_id INT NOT NULL,
       destino_id INT NOT NULL,
       tipo_transacao VARCHAR(50) NOT NULL,

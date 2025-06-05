@@ -7,6 +7,7 @@ const logger = require('../config/logger');
 class MoedasCron {
   static init() {
     // Agendando para rodar no primeiro dia de Janeiro e Julho às 00:00
+    // Para testar, mude o '0 0 1 1,7 *' para '* * * * *' para rodar a cada minuto
     cron.schedule('0 0 1 1,7 *', this.executarAdicaoDeMoedas);
     
     logger.info('Agendador de moedas semestrais iniciado...');
@@ -26,7 +27,7 @@ class MoedasCron {
       for (const professor of professores) {
         try {
           // Adiciona as moedas
-          await ProfessorModel.atualizarSaldo(professor.id, 1000);
+          await ProfessorModel.adicionarSaldo(professor.id, 1000);
           
           // Cria a transação
           await TransacaoModel.criar({
