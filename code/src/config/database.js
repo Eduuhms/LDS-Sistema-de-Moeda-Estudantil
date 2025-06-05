@@ -27,7 +27,7 @@ const initDb = async () => {
         )
       `);
 
-    // Tabela de usuários - Adicionando 'instituicao' ao ENUM
+    // Tabela de usuários
     await pool.query(`
         CREATE TABLE IF NOT EXISTS usuarios (
           id INT AUTO_INCREMENT PRIMARY KEY,

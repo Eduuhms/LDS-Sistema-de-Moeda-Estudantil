@@ -1,4 +1,6 @@
 const ProfessorModel = require('../models/ProfessorModel');
+const TransacaoModel = require('../models/TransacaoModel');
+const TipoTransacaoEnum = require('../models/TipoTransacaoEnum');
 const cron = require('node-cron');
 const logger = require('../config/logger');
 
@@ -17,9 +19,29 @@ class MoedasCron {
       
       logger.info(`Iniciando adição semestral de moedas (Semestre ${semestre} de ${now.getFullYear()})...`);
       
-      await ProfessorModel.adicionarSaldoATodos(1000);
+      // Primeiro obtemos todos os professores
+      const professores = await ProfessorModel.listarIds();
       
-      logger.info(`Moedas do semestre ${semestre} adicionadas com sucesso a todos os professores.`);
+      // Para cada professor, adicionamos moedas e criamos a transação
+      for (const professor of professores) {
+        try {
+          // Adiciona as moedas
+          await ProfessorModel.atualizarSaldo(professor.id, 1000);
+          
+          // Cria a transação
+          await TransacaoModel.criar({
+            quantidade: 1000,
+            mensagem: 'Recebimento semestral de moedas',
+            origemId: 1,
+            destinoId: professor.usuario_id,
+            tipoTransacao: TipoTransacaoEnum.RECEBIMENTO_SEMESTRAL
+          });
+        } catch (error) {
+          logger.error(`Erro ao processar professor ID ${professor.id}:`, error);
+        }
+      }
+      
+      logger.info(`Moedas do semestre ${semestre} adicionadas com sucesso a todos os professores. Total: ${professores.length} professores.`);
     } catch (error) {
       logger.error('Erro ao adicionar moedas semestrais:', error);
     }
@@ -27,36 +49,3 @@ class MoedasCron {
 }
 
 module.exports = MoedasCron;
-
-/* 
-
-TESTE PARA ADICIONAR MOEDAS A CADA MINUTO
-
-const cron = require('node-cron');
-const ProfessorModel = require('../models/ProfessorModel');
-
-class MoedasCron {
-  static init() {
-    // Modifique para executar a cada minuto (apenas para teste)
-    cron.schedule('* * * * *', this.executarAdicaoDeMoedas);
-    
-    console.log('⚠️ AGENDADOR EM MODO TESTE - Executando a cada minuto');
-  }
-
-  static async executarAdicaoDeMoedas() {
-    try {
-      console.log('🏦 TESTE: Adicionando moedas...');
-      await ProfessorModel.adicionarSaldoATodos(1000);
-      console.log('✅ Moedas adicionadas com sucesso (TESTE)');
-    } catch (error) {
-      console.error('❌ Erro no teste:', error);
-    }
-  }
-}
-
-// Execute imediatamente para teste (adicione estas linhas)
-console.log("🔹 Executando teste manual...");
-MoedasCron.executarAdicaoDeMoedas();
-
-module.exports = MoedasCron;
-*/

@@ -75,11 +75,12 @@ class ProfessorModel extends UsuarioModel {
       [novoSaldo, id]
     );
   }
-  static async adicionarSaldoATodos(valor) {
-  await db.query(
-    'UPDATE professores SET saldo = saldo + ?, updated_at = CURRENT_TIMESTAMP',
-    [valor]
+
+static async listarIds() {
+  const [professores] = await db.query(
+    'SELECT id, usuario_id FROM professores'
   );
+  return professores;
 }
 }
 
