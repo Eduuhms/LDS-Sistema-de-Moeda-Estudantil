@@ -189,6 +189,47 @@
       color: var(--white);
       border-color: var(--primary);
     }
+
+      .balance-summary {
+    display: flex;
+    justify-content: space-evenly;
+    margin-left: 2rem;
+    margin-right: 2rem;
+    margin-top: 2rem;
+    gap: 2rem;
+  }
+
+  .balance-card {
+    background: var(--white);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    flex: 1;
+    text-align: center;
+  }
+
+  .balance-card h3 {
+    color: #6c757d;
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .balance-amount {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+
+  .balance-amount.gain {
+    color: var(--success);
+  }
+
+  .balance-amount.loss {
+    color: var(--danger);
+  }
+
+  .balance-amount.net {
+    color: var(--primary);
+  }
   </style>
 </head>
 <body>
@@ -200,6 +241,21 @@
       </div>
     </div>
   </nav>
+
+<div class="balance-summary">
+  <div class="balance-card">
+    <h3>Total Recebido</h3>
+    <span class="balance-amount gain" id="totalGanhos">0 moedas</span>
+  </div>
+  <div class="balance-card">
+    <h3>Total Gastos</h3>
+    <span class="balance-amount loss" id="totalGastos">0 moedas</span>
+  </div>
+  <div class="balance-card">
+    <h3>Saldo Líquido</h3>
+    <span class="balance-amount net" id="saldoLiquido">0 moedas</span>
+  </div>
+</div>
 
   <div class="main-container">
     <div class="page-header">
@@ -243,43 +299,63 @@
       }
     }
 
-    function displayTransactions(transacoes) {
-      const container = document.getElementById('transactionsList');
-      if (!transacoes || transacoes.length === 0) {
-        container.innerHTML = `
-          <div class="no-transactions">
-            <p>Nenhuma transação encontrada.</p>
-          </div>
-        `;
-        return;
-      }
-
-      container.innerHTML = transacoes.map(transacao => {
-        const isGain = transacao.tipo === 'GANHO' || transacao.tipo === 'ENVIO_PROFESSOR';
-        const icon = isGain ? '↓' : '↑';
-        const iconClass = isGain ? 'transaction-gain' : 'transaction-loss';
-        const amountClass = isGain ? 'amount-gain' : 'amount-loss';
-        const amountPrefix = isGain ? '+' : '-';
-        
-        return `
-          <div class="transaction-item" data-type="${isGain ? 'ganho' : 'gasto'}">
-            <div class="transaction-icon ${iconClass}">${icon}</div>
-            <div class="transaction-details">
-              <div class="transaction-title">${getTipoTransacao(transacao.tipo)}</div>
-              <div class="transaction-description">
-                ${transacao.mensagem || 'Sem descrição'}
-                <br>
-                <small class="text-muted">
-                  ${isGain ? 'Recebido de: ' + transacao.nome_origem : 'Enviado para: ' + transacao.nome_destino}
-                </small>
-              </div>
-            </div>
-            <span class="transaction-amount ${amountClass}">${amountPrefix}${transacao.quantidade} moedas</span>
-            <span class="transaction-date">${formatDate(transacao.created_at)}</span>
-          </div>
-        `;
-      }).join('');
+function displayTransactions(transacoes) {
+    const container = document.getElementById('transactionsList');
+    if (!transacoes || transacoes.length === 0) {
+      container.innerHTML = `
+        <div class="no-transactions">
+          <p>Nenhuma transação encontrada.</p>
+        </div>
+      `;
+      updateBalanceSummary(0, 0); // Atualiza com zeros se não houver transações
+      return;
     }
+
+    let totalGanhos = 0;
+    let totalGastos = 0;
+
+    container.innerHTML = transacoes.map(transacao => {
+      const isGain = transacao.tipo === 'GANHO' || transacao.tipo === 'ENVIO_PROFESSOR';
+      const icon = isGain ? '↓' : '↑';
+      const iconClass = isGain ? 'transaction-gain' : 'transaction-loss';
+      const amountClass = isGain ? 'amount-gain' : 'amount-loss';
+      const amountPrefix = isGain ? '+' : '-';
+      
+      // Atualiza os totais
+      if (isGain) {
+        totalGanhos += parseFloat(transacao.quantidade);
+      } else {
+        totalGastos += parseFloat(transacao.quantidade);
+      }
+      
+      return `
+        <div class="transaction-item" data-type="${isGain ? 'ganho' : 'gasto'}">
+          <div class="transaction-icon ${iconClass}">${icon}</div>
+          <div class="transaction-details">
+            <div class="transaction-title">${getTipoTransacao(transacao.tipo)}</div>
+            <div class="transaction-description">
+              ${transacao.mensagem || 'Sem descrição'}
+              <br>
+              <small class="text-muted">
+                ${isGain ? 'Recebido de: ' + transacao.nome_origem : 'Enviado para: ' + transacao.nome_destino}
+              </small>
+            </div>
+          </div>
+          <span class="transaction-amount ${amountClass}">${amountPrefix}${transacao.quantidade} moedas</span>
+          <span class="transaction-date">${formatDate(transacao.created_at)}</span>
+        </div>
+      `;
+    }).join('');
+
+    // Atualiza o resumo de saldo
+    updateBalanceSummary(totalGanhos, totalGastos);
+  }
+
+  function updateBalanceSummary(ganhos, gastos) {
+    document.getElementById('totalGanhos').textContent = `${ganhos.toFixed(2)} moedas`;
+    document.getElementById('totalGastos').textContent = `${gastos.toFixed(2)} moedas`;
+    document.getElementById('saldoLiquido').textContent = `${(ganhos - gastos).toFixed(2)} moedas`;
+  }
 
     function getTipoTransacao(tipo) {
       const tipos = {
