@@ -1,11 +1,14 @@
 
 const ProfessorModel = require('../models/ProfessorModel');
+const TransacaoModel = require('../models/TransacaoModel');
+const TipoTransacaoEnum = require('../models/TipoTransacaoEnum');
 const cron = require('node-cron');
 const logger = require('../config/logger');
 
 class MoedasCron {
   static init() {
-    // Agendando no primeiro dia de Janeiro e Julho
+    // Agendando para rodar no primeiro dia de Janeiro e Julho às 00:00
+    // Para testar, mude o '0 0 1 1,7 *' para '* * * * *' para rodar a cada minuto
     cron.schedule('0 0 1 1,7 *', this.executarAdicaoDeMoedas);
     
     logger.info('Agendador de moedas semestrais iniciado...');
@@ -18,9 +21,29 @@ class MoedasCron {
       
       logger.info(`Iniciando adição semestral de moedas (Semestre ${semestre} de ${now.getFullYear()})...`);
       
-      await ProfessorModel.adicionarSaldoATodos(1000);
+      // Primeiro obtemos todos os professores
+      const professores = await ProfessorModel.listarIds();
       
-      logger.info(`Moedas do semestre ${semestre} adicionadas com sucesso a todos os professores.`);
+      // Para cada professor, adicionamos moedas e criamos a transação
+      for (const professor of professores) {
+        try {
+          // Adiciona as moedas
+          await ProfessorModel.adicionarSaldo(professor.id, 1000);
+          
+          // Cria a transação
+          await TransacaoModel.criar({
+            quantidade: 1000,
+            mensagem: 'Recebimento semestral de moedas',
+            origemId: 1,
+            destinoId: professor.usuario_id,
+            tipoTransacao: TipoTransacaoEnum.RECEBIMENTO_SEMESTRAL
+          });
+        } catch (error) {
+          logger.error(`Erro ao processar professor ID ${professor.id}:`, error);
+        }
+      }
+      
+      logger.info(`Moedas do semestre ${semestre} adicionadas com sucesso a todos os professores. Total: ${professores.length} professores.`);
     } catch (error) {
       logger.error('Erro ao adicionar moedas semestrais:', error);
     }

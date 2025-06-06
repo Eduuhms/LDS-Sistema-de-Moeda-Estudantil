@@ -281,13 +281,35 @@ class ProfessorController {
 
 static async adicionarMoedasMensais(req, res) {
   try {
-    // Verifica se o usuário é admin (adicione sua lógica de autenticação aqui)
+    // Verifica se o usuário é admin
     if (!req.session.userId || req.session.userType !== 'admin') {
       return res.status(403).json({ erro: 'Acesso negado. Apenas administradores podem executar esta ação.' });
     }
 
-    await ProfessorModel.adicionarSaldoATodos(1000);
-    return res.status(200).json({ mensagem: '1000 moedas adicionadas a todos os professores com sucesso.' });
+    const professores = await ProfessorModel.listarIds();
+    
+    // Para cada professor, adicionamos moedas e criamos a transação
+    for (const professor of professores) {
+      try {
+        // Adiciona as moedas
+        await ProfessorModel.atualizarSaldo(professor.id, 1000);
+        
+        // Cria a transação
+        await TransacaoModel.criar({
+          quantidade: 1000,
+          mensagem: 'Recebimento semestral de moedas',
+          origemId: 1, // ID da instituição
+          destinoId: professor.usuario_id,
+          tipoTransacao: TipoTransacaoEnum.RECEBIMENTO_SEMESTRAL
+        });
+      } catch (error) {
+        console.error(`Erro ao processar professor ID ${professor.id}:`, error);
+      }
+    }
+    
+    return res.status(200).json({ 
+      mensagem: `1000 moedas adicionadas a todos os professores com sucesso. Total: ${professores.length} professores.`
+    });
   } catch (error) {
     console.error('Erro ao adicionar moedas mensais:', error);
     return res.status(500).json({ erro: 'Erro ao adicionar moedas mensais.' });
