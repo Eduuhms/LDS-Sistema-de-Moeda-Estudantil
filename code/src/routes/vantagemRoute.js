@@ -10,4 +10,5 @@ router.get('/listar-empresa', VantagemController.buscarPorEmpresaLogada);
 router.get('/buscar/:id', VantagemController.buscarPorId);
 router.get('/empresa', VantagemController.renderVantagensEmpresa);
 router.get('/aluno', VantagemController.renderVantagensAluno);
+router.post('/resgatar', VantagemController.resgatarVantagem);
 module.exports = router;

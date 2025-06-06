@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,13 +19,13 @@
       --border: #e9ecef;
       --gold: #ffd700;
     }
-    
+
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
+
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.6;
@@ -36,7 +37,7 @@
     /* Navbar */
     .navbar {
       background-color: var(--white);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       padding: 1rem 0;
       position: sticky;
       top: 0;
@@ -88,7 +89,7 @@
       right: 0;
       background-color: var(--white);
       min-width: 200px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
       border-radius: 4px;
       overflow: hidden;
       margin-top: 0.5rem;
@@ -171,7 +172,7 @@
       background: var(--white);
       padding: 1.5rem;
       border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
       margin-bottom: 2rem;
       display: flex;
       gap: 1rem;
@@ -348,7 +349,7 @@
       top: 0;
       width: 100%;
       height: 100%;
-      background-color: rgba(0,0,0,0.5);
+      background-color: rgba(0, 0, 0, 0.5);
     }
 
     .modal-content {
@@ -360,7 +361,7 @@
       max-width: 700px;
       max-height: 90vh;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     }
 
     .modal-header {
@@ -389,7 +390,7 @@
       position: absolute;
       top: 1rem;
       right: 1rem;
-      background: rgba(0,0,0,0.7);
+      background: rgba(0, 0, 0, 0.7);
       color: white;
       border: none;
       border-radius: 50%;
@@ -403,7 +404,7 @@
     }
 
     .close:hover {
-      background: rgba(0,0,0,0.9);
+      background: rgba(0, 0, 0, 0.9);
     }
 
     .modal-body {
@@ -459,8 +460,13 @@
     }
 
     @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
+      0% {
+        transform: rotate(0deg);
+      }
+
+      100% {
+        transform: rotate(360deg);
+      }
     }
 
     /* Empty State */
@@ -504,21 +510,21 @@
       .navbar-menu {
         gap: 1rem;
       }
-      
+
       .saldo-container {
         font-size: 0.9rem;
         padding: 0.4rem 0.8rem;
       }
-      
+
       .page-title {
         font-size: 2rem;
       }
-      
+
       .filters-container {
         flex-direction: column;
         align-items: stretch;
       }
-      
+
       .vantagens-grid {
         grid-template-columns: 1fr;
       }
@@ -536,6 +542,7 @@
     }
   </style>
 </head>
+
 <body>
   <!-- Navbar -->
   <nav class="navbar">
@@ -569,11 +576,13 @@
     <div class="filters-container">
       <div class="filter-group">
         <label class="filter-label" for="searchInput">Buscar:</label>
-        <input type="text" id="searchInput" class="filter-input" placeholder="Nome da vantagem..." oninput="filterVantagens()">
+        <input type="text" id="searchInput" class="filter-input" placeholder="Nome da vantagem..."
+          oninput="filterVantagens()">
       </div>
       <div class="filter-group">
         <label class="filter-label" for="priceFilter">Preço máximo:</label>
-        <input type="number" id="priceFilter" class="filter-input" placeholder="Máximo de moedas" min="0" oninput="filterVantagens()">
+        <input type="number" id="priceFilter" class="filter-input" placeholder="Máximo de moedas" min="0"
+          oninput="filterVantagens()">
       </div>
       <div class="filter-group">
         <input type="checkbox" id="affordableOnly" onchange="filterVantagens()">
@@ -637,7 +646,8 @@
     <div class="modal-content">
       <div class="modal-header" style="padding: 2rem; border-bottom: 1px solid var(--border);">
         <h2 style="margin: 0; color: var(--primary);">Informações da Conta</h2>
-        <button class="close" style="position: static; background: none; color: #aaa; font-size: 28px;" onclick="closeAccountModal()">&times;</button>
+        <button class="close" style="position: static; background: none; color: #aaa; font-size: 28px;"
+          onclick="closeAccountModal()">&times;</button>
       </div>
       <div style="padding: 2rem;" id="accountInfo">
         <p><strong>E-mail:</strong> <span id="userEmail"></span></p>
@@ -652,7 +662,7 @@
     let allVantagens = [];
     let currentVantagem = null;
 
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
       loadUserData();
       loadVantagens();
     });
@@ -661,25 +671,25 @@
     async function loadUserData() {
       try {
         const response = await fetch('/usuario/user-data');
-        
+
         if (!response.ok) {
           throw new Error('Erro ao carregar dados do usuário');
         }
-        
+
         currentUser = await response.json();
-        
+
         // Atualiza UI com dados do usuário
         const userAvatar = document.getElementById('userAvatar');
         const saldoDisplay = document.getElementById('saldoDisplay');
-        
+
         if (currentUser.nome) {
           userAvatar.textContent = currentUser.nome.charAt(0).toUpperCase();
         }
-        
+
         if (currentUser.saldo !== undefined) {
           saldoDisplay.textContent = `${currentUser.saldo} moedas`;
         }
-        
+
       } catch (error) {
         console.error('Erro ao carregar dados do usuário:', error);
         window.location.href = '/usuario/login';
@@ -691,29 +701,29 @@
       const loading = document.getElementById('loading');
       const grid = document.getElementById('vantagensGrid');
       const emptyState = document.getElementById('emptyState');
-      
+
       try {
         loading.style.display = 'block';
         grid.style.display = 'none';
         emptyState.style.display = 'none';
-        
+
         const response = await fetch('/vantagens/listar');
-        
+
         if (!response.ok) {
           throw new Error('Erro ao carregar vantagens');
         }
-        
+
         allVantagens = await response.json();
-        
+
         loading.style.display = 'none';
-        
+
         if (allVantagens.length === 0) {
           emptyState.style.display = 'block';
         } else {
           grid.style.display = 'grid';
           renderVantagens(allVantagens);
         }
-        
+
       } catch (error) {
         console.error('Erro ao carregar vantagens:', error);
         loading.style.display = 'none';
@@ -725,7 +735,7 @@
     function renderVantagens(vantagens) {
       const grid = document.getElementById('vantagensGrid');
       grid.innerHTML = '';
-      
+
       if (vantagens.length === 0) {
         document.getElementById('emptyState').style.display = 'block';
         grid.style.display = 'none';
@@ -734,15 +744,15 @@
 
       document.getElementById('emptyState').style.display = 'none';
       grid.style.display = 'grid';
-      
+
       vantagens.forEach(vantagem => {
         const canAfford = currentUser && currentUser.saldo >= vantagem.custo_moedas;
         const cardClass = canAfford ? 'vantagem-card can-afford' : 'vantagem-card cannot-afford';
-        
+
         const card = document.createElement('div');
         card.className = cardClass;
         card.onclick = () => openVantagemModal(vantagem);
-        
+
         card.innerHTML = `
           <div class="vantagem-image">
             ${vantagem.foto ? `<img src="${vantagem.foto}" alt="${vantagem.nome}" onerror="this.parentElement.innerHTML='🎁'">` : '🎁'}
@@ -771,19 +781,19 @@
       const searchTerm = document.getElementById('searchInput').value.toLowerCase();
       const maxPrice = document.getElementById('priceFilter').value;
       const affordableOnly = document.getElementById('affordableOnly').checked;
-      
+
       let filteredVantagens = allVantagens.filter(vantagem => {
-        const matchesSearch = vantagem.nome.toLowerCase().includes(searchTerm) || 
-                             vantagem.descricao.toLowerCase().includes(searchTerm);
-        
+        const matchesSearch = vantagem.nome.toLowerCase().includes(searchTerm) ||
+          vantagem.descricao.toLowerCase().includes(searchTerm);
+
         const matchesPrice = !maxPrice || vantagem.custo_moedas <= parseInt(maxPrice);
-        
-        const matchesAffordable = !affordableOnly || 
-                                 (currentUser && currentUser.saldo >= vantagem.custo_moedas);
-        
+
+        const matchesAffordable = !affordableOnly ||
+          (currentUser && currentUser.saldo >= vantagem.custo_moedas);
+
         return matchesSearch && matchesPrice && matchesAffordable;
       });
-      
+
       renderVantagens(filteredVantagens);
     }
 
@@ -798,26 +808,26 @@
     // Abre modal de vantagem
     function openVantagemModal(vantagem) {
       currentVantagem = vantagem;
-      
+
       const modal = document.getElementById('vantagemModal');
       const modalImage = document.getElementById('modalImage');
       const modalTitle = document.getElementById('modalTitle');
       const modalDescription = document.getElementById('modalDescription');
       const modalPrice = document.getElementById('modalPrice');
       const resgateBtn = document.getElementById('resgateBtn');
-      
+
       modalTitle.textContent = vantagem.nome;
       modalDescription.textContent = vantagem.descricao;
       modalPrice.textContent = `${vantagem.custo_moedas} moedas`;
-      
+
       if (vantagem.foto) {
         modalImage.innerHTML = `<img src="${vantagem.foto}" alt="${vantagem.nome}" onerror="this.parentElement.innerHTML='🎁'">`;
       } else {
         modalImage.innerHTML = '🎁';
       }
-      
+
       const canAfford = currentUser && currentUser.saldo >= vantagem.custo_moedas;
-      
+
       if (canAfford) {
         resgateBtn.textContent = 'Resgatar Vantagem';
         resgateBtn.className = 'btn btn-success';
@@ -827,7 +837,7 @@
         resgateBtn.className = 'btn btn-primary';
         resgateBtn.disabled = true;
       }
-      
+
       modal.style.display = 'block';
     }
 
@@ -837,18 +847,53 @@
       currentVantagem = null;
     }
 
-    // Resgatar vantagem (placeholder - implementar depois)
-    function resgatarVantagem() {
-      if (!currentVantagem) return;
-      
-      if (currentUser.saldo < currentVantagem.custo_moedas) {
-        showAlert('Saldo insuficiente para resgatar esta vantagem!', 'danger');
-        return;
+    async function resgatarVantagem() {
+      if (!currentVantagem || !currentUser) return;
+
+      const resgateBtn = document.getElementById('resgateBtn');
+      resgateBtn.disabled = true;
+      resgateBtn.textContent = 'Processando...';
+
+      try {
+        const response = await fetch('/vantagens/resgatar', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ vantagemId: currentVantagem.id }),
+          credentials: 'include'
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          showAlert(data.mensagem, 'success');
+
+          // Atualiza o saldo do usuário
+          currentUser.saldo = data.saldoAtual;
+          document.getElementById('saldoDisplay').textContent = `${data.saldoAtual} moedas`;
+
+          // Atualiza a lista de vantagens
+          await loadVantagens();
+
+          // Fecha o modal após 2 segundos
+          setTimeout(closeVantagemModal, 2000);
+        } else {
+          showAlert(data.erro || 'Erro ao resgatar vantagem', 'danger');
+          resgateBtn.disabled = false;
+          resgateBtn.textContent = 'Resgatar Vantagem';
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        showAlert('Erro ao conectar com o servidor', 'danger');
+        resgateBtn.disabled = false;
+        resgateBtn.textContent = 'Resgatar Vantagem';
       }
-      
-      // Aqui você implementaria a lógica de resgate
-      showAlert('Funcionalidade de resgate será implementada em breve!', 'danger');
     }
+
+    function formatSaldo(saldo) {
+    return saldo !== undefined ? `${saldo} moedas` : '0 moedas';
+}
 
     // Funções do dropdown
     function toggleDropdown() {
@@ -867,10 +912,10 @@
         const userEmail = document.getElementById('userEmail');
         const userType = document.getElementById('userType');
         const additionalInfo = document.getElementById('additionalInfo');
-        
+
         userEmail.textContent = currentUser.email;
         userType.textContent = currentUser.tipo;
-        
+
         if (currentUser.tipo === 'aluno') {
           additionalInfo.innerHTML = `
             <p><strong>Curso:</strong> ${currentUser.curso || 'Não informado'}</p>
@@ -879,7 +924,7 @@
           `;
         }
       }
-      
+
       document.getElementById('accountModal').style.display = 'block';
     }
 
@@ -891,21 +936,21 @@
     function showAlert(message, type) {
       const alertId = type === 'success' ? 'alertSuccess' : 'alertError';
       const messageId = type === 'success' ? 'alertSuccessMessage' : 'alertErrorMessage';
-      
+
       document.getElementById(messageId).textContent = message;
       document.getElementById(alertId).classList.add('show');
-      
+
       setTimeout(() => {
         document.getElementById(alertId).classList.remove('show');
       }, 5000);
     }
 
     // Fecha modais clicando fora
-    window.onclick = function(event) {
+    window.onclick = function (event) {
       const vantagemModal = document.getElementById('vantagemModal');
       const accountModal = document.getElementById('accountModal');
       const dropdown = document.querySelector('.dropdown');
-      
+
       if (event.target === vantagemModal) {
         closeVantagemModal();
       } else if (event.target === accountModal) {
@@ -916,13 +961,14 @@
     }
 
     // Fecha dropdown quando clica fora dele
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
       const dropdown = document.querySelector('.dropdown');
-      
+
       if (!dropdown.contains(event.target)) {
         dropdown.classList.remove('show');
       }
     });
   </script>
 </body>
-</html> 
+
+</html>

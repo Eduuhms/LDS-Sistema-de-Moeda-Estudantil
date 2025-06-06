@@ -164,7 +164,7 @@ class VantagemController {
             // Busca o ID da empresa baseado no usuário logado
             const EmpresaModel = require('../models/EmpresaModel');
             const empresa = await EmpresaModel.buscarPorUsuarioId(req.session.userId);
-            
+
             if (!empresa) {
                 return res.status(404).json({ erro: 'Empresa não encontrada para este usuário' });
             }
@@ -180,7 +180,7 @@ class VantagemController {
         }
     }
 
-    
+
     static async renderVantagensEmpresa(req, res) {
         if (!req.session.userId) {
             return res.redirect('/usuario/login');
@@ -206,6 +206,63 @@ class VantagemController {
         }
         res.render('vantagens-aluno');
     }
+
+    static async resgatarVantagem(req, res) {
+        try {
+            const { vantagemId } = req.body;
+            const alunoId = req.session.userId;
+
+            if (!alunoId) {
+                return res.status(401).json({ erro: 'Usuário não autenticado' });
+            }
+
+            // Verifica se o usuário é um aluno
+            const AlunoModel = require('../models/AlunoModel');
+            const aluno = await AlunoModel.buscarPorUsuarioId(alunoId);
+            if (!aluno) {
+                return res.status(403).json({ erro: 'Apenas alunos podem resgatar vantagens' });
+            }
+
+            // Busca a vantagem
+            const vantagem = await VantagemModel.buscarPorId(vantagemId);
+            if (!vantagem) {
+                return res.status(404).json({ erro: 'Vantagem não encontrada' });
+            }
+
+            // Verifica saldo do aluno
+            if (aluno.saldo < vantagem.custo_moedas) {
+                return res.status(400).json({ erro: 'Saldo insuficiente para resgatar esta vantagem' });
+            }
+
+            // Cria a transação de resgate
+            const TransacaoModel = require('../models/TransacaoModel');
+            const transacaoId = await TransacaoModel.criar({
+                quantidade: vantagem.custo_moedas,
+                mensagem: `Resgate da vantagem: ${vantagem.nome}`,
+                origemId: alunoId,
+                destinoId: vantagem.empresa_id,
+                tipoTransacao: 'RESGATE_VANTAGEM'
+            });
+
+            // Atualiza o saldo do aluno (debitando o valor)
+            const novoSaldo = aluno.saldo - vantagem.custo_moedas;
+            await AlunoModel.atualizarSaldo(aluno.id, novoSaldo);
+
+            return res.status(200).json({
+                mensagem: 'Vantagem resgatada com sucesso',
+                transacaoId,
+                saldoAtual: novoSaldo
+            });
+
+        } catch (error) {
+            console.error('Erro ao resgatar vantagem:', error);
+            return res.status(500).json({
+                erro: 'Falha ao resgatar vantagem. Por favor, tente novamente mais tarde.'
+            });
+        }
+    }
 }
+
+
 
 module.exports = VantagemController;
