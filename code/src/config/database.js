@@ -119,6 +119,20 @@ const initDb = async () => {
         )
       `);
 
+
+      await pool.query(`
+       CREATE TABLE resgates (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    data_resgate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    aluno_id INT NOT NULL,
+    vantagem_id INT NOT NULL,
+    transacao_id INT NOT NULL,
+    FOREIGN KEY (aluno_id) REFERENCES alunos(id),
+    FOREIGN KEY (vantagem_id) REFERENCES vantagens(id),
+    FOREIGN KEY (transacao_id) REFERENCES transacoes(id)
+)
+    `);
+
     // Verificar se o usuário instituição já existe
     const [userRows] = await pool.query('SELECT * FROM usuarios WHERE email = ?', ['instituicao@gmail.com']);
     

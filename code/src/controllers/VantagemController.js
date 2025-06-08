@@ -209,8 +209,13 @@ class VantagemController {
 
     static async resgatarVantagem(req, res) {
         try {
+            // Verifica se o corpo da requisição está presente
+            if (!req.body || !req.body.vantagemId) {
+                return res.status(400).json({ erro: 'Dados de requisição inválidos' });
+            }
+
             const { vantagemId } = req.body;
-            const alunoId = req.session.userId;
+            const alunoId = req.session.userId; // Obtém do session em vez do body
 
             if (!alunoId) {
                 return res.status(401).json({ erro: 'Usuário não autenticado' });
@@ -244,7 +249,15 @@ class VantagemController {
                 tipoTransacao: 'RESGATE_VANTAGEM'
             });
 
-            // Atualiza o saldo do aluno (debitando o valor)
+            // Registra o resgate
+            const ResgateModel = require('../models/ResgateModel');
+            await ResgateModel.criar({
+                aluno_id: aluno.id,
+                vantagem_id: vantagem.id,
+                transacao_id: transacaoId
+            });
+
+            // Atualiza o saldo do aluno
             const novoSaldo = aluno.saldo - vantagem.custo_moedas;
             await AlunoModel.atualizarSaldo(aluno.id, novoSaldo);
 

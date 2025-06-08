@@ -848,48 +848,50 @@
     }
 
     async function resgatarVantagem() {
-      if (!currentVantagem || !currentUser) return;
+    if (!currentVantagem || !currentUser) return;
 
-      const resgateBtn = document.getElementById('resgateBtn');
-      resgateBtn.disabled = true;
-      resgateBtn.textContent = 'Processando...';
+    const resgateBtn = document.getElementById('resgateBtn');
+    resgateBtn.disabled = true;
+    resgateBtn.textContent = 'Processando...';
 
-      try {
+    try {
         const response = await fetch('/vantagens/resgatar', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ vantagemId: currentVantagem.id }),
-          credentials: 'include'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                vantagemId: currentVantagem.id,
+                alunoId: currentUser.id // Adicione isso se necessário
+            }),
+            credentials: 'include'
         });
+
+        if (!response.ok) {
+            throw new Error('Erro na resposta do servidor');
+        }
 
         const data = await response.json();
 
-        if (response.ok) {
-          showAlert(data.mensagem, 'success');
+        showAlert(data.mensagem, 'success');
 
-          // Atualiza o saldo do usuário
-          currentUser.saldo = data.saldoAtual;
-          document.getElementById('saldoDisplay').textContent = `${data.saldoAtual} moedas`;
+        // Atualiza o saldo do usuário
+        currentUser.saldo = data.saldoAtual;
+        document.getElementById('saldoDisplay').textContent = `${data.saldoAtual} moedas`;
 
-          // Atualiza a lista de vantagens
-          await loadVantagens();
+        // Atualiza a lista de vantagens
+        await loadVantagens();
+        // await loadResgates(); // Carrega a lista de resgates atualizada
 
-          // Fecha o modal após 2 segundos
-          setTimeout(closeVantagemModal, 2000);
-        } else {
-          showAlert(data.erro || 'Erro ao resgatar vantagem', 'danger');
-          resgateBtn.disabled = false;
-          resgateBtn.textContent = 'Resgatar Vantagem';
-        }
-      } catch (error) {
+        // Fecha o modal após 2 segundos
+        setTimeout(closeVantagemModal, 2000);
+    } catch (error) {
         console.error('Erro:', error);
-        showAlert('Erro ao conectar com o servidor', 'danger');
+        showAlert(error.message || 'Erro ao resgatar vantagem', 'danger');
         resgateBtn.disabled = false;
         resgateBtn.textContent = 'Resgatar Vantagem';
-      }
     }
+}
 
     function formatSaldo(saldo) {
     return saldo !== undefined ? `${saldo} moedas` : '0 moedas';
