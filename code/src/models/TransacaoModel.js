@@ -8,7 +8,14 @@ class TransacaoModel {
             'INSERT INTO transacoes (quantidade, mensagem, origem_id, destino_id, tipo_transacao) VALUES (?, ?, ?, ?, ?)',
             [quantidade, mensagem, origemId, destinoId, tipoTransacao]
         );
-        return result.insertId;
+        return {
+            id: result.insertId,
+            quantidade,
+            mensagem,
+            origemId,
+            destinoId,
+            tipoTransacao
+        };
     }
 
     static async buscarPorId(id) {

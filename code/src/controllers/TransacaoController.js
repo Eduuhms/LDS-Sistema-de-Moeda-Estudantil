@@ -1,7 +1,6 @@
 const TransacaoModel = require('../models/TransacaoModel');
 const UsuarioModel = require('../models/UsuarioModel');
-const AlunoModel = require('../models/AlunoModel');
-const ProfessorModel = require('../models/ProfessorModel');
+
 class TransacaoController {
     static async listar(req, res) {
         try {
@@ -28,122 +27,97 @@ class TransacaoController {
         }
     }
 
-static async criar(req, res) {
-    try {
-        const {quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
-        
-        // Garantir que quantidade seja tratada como número
-        const quantidadeNum = parseFloat(quantidade);
-        
-        if (!quantidade || !origemId || !destinoId || !tipoTransacao || isNaN(quantidadeNum)) {
-            return res.status(400).json({ erro: 'Campos obrigatórios: quantidade (numérica), origemId, destinoId, tipoTransacao' });
-        }
-
-        const id = await TransacaoModel.criar({
-            quantidade: quantidadeNum, 
-            mensagem, 
-            origemId, 
-            destinoId, 
-            tipoTransacao 
-        });
-        
-        const transacao = await TransacaoModel.buscarPorId(id);
-        
-        // Atualiza dados do usuario de origem 
-        const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
-        if (usuarioOrigem.tipo != 'empresa'){
-            let usuarioOrigemDados;
-            if (usuarioOrigem.tipo == 'professor') {
-                usuarioOrigemDados = await ProfessorModel.buscarPorUsuarioId(origemId);
-            } else if (usuarioOrigem.tipo == 'aluno') {
-                usuarioOrigemDados = await AlunoModel.buscarPorUsuarioId(origemId);
+    static async criar(req, res) {
+        try {
+            const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
+            const quantidadeNum = parseFloat(quantidade);
+    
+            if (!quantidade || !origemId || !destinoId || !tipoTransacao || isNaN(quantidadeNum)) {
+                return res.status(400).json({ erro: 'Campos obrigatórios: quantidade (numérica), origemId, destinoId, tipoTransacao' });
             }
+    
+            const transacao = await TransacaoModel.criar({
+                quantidade: quantidadeNum,
+                mensagem,
+                origemId,
+                destinoId,
+                tipoTransacao
+            });
+            console.log("transacao")
+            console.log(transacao)
+    
+            // const transacao = await TransacaoModel.buscarPorId(id);
+    
+            // Atualiza saldo do usuário de origem
+            const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
+            console.log("usuarioOrigem")
+            console.log(usuarioOrigem)
+            if (usuarioOrigem.tipo !== 'empresa') {
+                const dadosOrigem = await UsuarioModel.buscarDadosUsuario(usuarioOrigem);
+                console.log("dadosOrigem")
+                console.log(dadosOrigem)
+                const novoSaldoOrigem = parseFloat(dadosOrigem.saldo || 0) - quantidadeNum;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioOrigem, novoSaldoOrigem);
+            }
+    
             
-            // Garantir que o saldo atual seja tratado como número
-            usuarioOrigemDados.saldo = parseFloat(usuarioOrigemDados.saldo || 0);
-            usuarioOrigemDados.saldo -= quantidadeNum;
-
-            if (usuarioOrigem.tipo == 'professor') {
-                await ProfessorModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
-            } else if (usuarioOrigem.tipo == 'aluno') {
-                await AlunoModel.atualizarSaldo(usuarioOrigemDados.id, usuarioOrigemDados.saldo);
+            // Atualiza saldo do usuário de destino
+            const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
+            console.log("usuarioDestino")
+            console.log(usuarioDestino)
+            if (usuarioDestino.tipo !== 'empresa') {
+                const dadosDestino = await UsuarioModel.buscarDadosUsuario(usuarioDestino);
+                console.log("dadosDestino")
+                console.log(dadosDestino)
+                const novoSaldoDestino = parseFloat(dadosDestino.saldo || 0) + quantidadeNum;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioDestino, novoSaldoDestino);
             }
+    
+            return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
+        } catch (error) {
+            console.error('Erro ao criar transação:', error);
+            return res.status(500).json({ erro: 'Erro ao criar transação.' });
         }
-
-        // Atualizando dados do usuario de destino
-        const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
-        if (usuarioDestino.tipo != 'empresa'){
-            let usuarioDestinoDados;
-            if (usuarioDestino.tipo == 'professor') {
-                usuarioDestinoDados = await ProfessorModel.buscarPorUsuarioId(destinoId);
-            } else if (usuarioDestino.tipo == 'aluno') {
-                usuarioDestinoDados = await AlunoModel.buscarPorUsuarioId(destinoId);
-            }
-            
-            // Garantir que o saldo atual seja tratado como número
-            usuarioDestinoDados.saldo = parseFloat(usuarioDestinoDados.saldo || 0);
-            usuarioDestinoDados.saldo += quantidadeNum;
-
-            if (usuarioDestino.tipo == 'professor') {
-                await ProfessorModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
-            } else if (usuarioDestino.tipo == 'aluno') {
-                await AlunoModel.atualizarSaldo(usuarioDestinoDados.id, usuarioDestinoDados.saldo);
-            }
-        }
-        
-        return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
-    } catch (error) {
-        console.error('Erro ao criar transação:', error);
-        return res.status(500).json({ erro: 'Erro ao criar transação.' });
     }
-}
 
     static async atualizar(req, res) {
         try {
             const { id } = req.params;
             const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
             const transacao = await TransacaoModel.buscarPorId(id);
-            var usuarioOrigemDados, usuarioDestinoDados;
+    
             if (!transacao) {
                 return res.status(404).json({ erro: 'Transação não encontrada.' });
             }
-
-            // Atualizando dados do usuario de origem 
+    
+            // Reverte saldos antigos
             const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
-            if (usuarioOrigem.tipoUsuario != 'empresa'){
-                if (usuarioOrigem.tipoUsuario == 'professor') {
-                    usuarioOrigemDados = await ProfessorModel.buscarPorUsuarioId(origemId);
-                } else if (usuarioOrigem.tipoUsuario == 'aluno') {
-                    usuarioOrigemDados = await AlunoModel.buscarPorUsuarioId(origemId);
-                }
-                usuarioOrigemDados.saldo += transacao.quantidade;
-                usuarioOrigemDados.saldo += quantidade;
-
-                if (usuarioOrigem.tipoUsuario == 'professor') {
-                    usuarioOrigemDados = await ProfessorModel.atualizarSaldo(origemId, usuarioOrigemDados.saldo);
-                } else if (usuarioOrigem.tipoUsuario == 'aluno') {
-                    usuarioOrigemDados = await AlunoModel.atualizarSaldo(origemId, usuarioOrigemDados.saldo);
-                }
+            const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
+    
+            if (usuarioOrigem.tipo !== 'empresa') {
+                const dadosOrigem = await UsuarioModel.buscarDadosUsuario(usuarioOrigem);
+                const saldoRevertido = parseFloat(dadosOrigem.saldo || 0) + transacao.quantidade;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioOrigem, saldoRevertido);
             }
-
-            // Atualizando dados do usuario de destino
-            if (usuarioOrigem.tipoUsuario != 'empresa'){
-                const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
-                if (usuarioDestino.tipoUsuario == 'professor') {
-                    usuarioDestinoDados = await ProfessorModel.buscarPorUsuarioId(destinoId);
-                } else if (usuarioDestino.tipoUsuario == 'aluno') {
-                    usuarioDestinoDados = await AlunoModel.buscarPorUsuarioId(destinoId);
-                }
-                usuarioDestinoDados.saldo -= transacao.quantidade;
-                usuarioDestinoDados.saldo += quantidade;
-
-                if (usuarioOrigem.tipoUsuario == 'professor') {
-                    usuarioOrigemDados = await ProfessorModel.atualizarSaldo(origemId, usuarioOrigemDados.saldo);
-                } else if (usuarioOrigem.tipoUsuario == 'aluno') {
-                    usuarioOrigemDados = await AlunoModel.atualizarSaldo(origemId, usuarioOrigemDados.saldo);
-                }
+            if (usuarioDestino.tipo !== 'empresa') {
+                const dadosDestino = await UsuarioModel.buscarDadosUsuario(usuarioDestino);
+                const saldoRevertido = parseFloat(dadosDestino.saldo || 0) - transacao.quantidade;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioDestino, saldoRevertido);
             }
-
+    
+            // Aplica novos saldos
+            const quantidadeNum = parseFloat(quantidade);
+            if (usuarioOrigem.tipo !== 'empresa') {
+                const dadosOrigem = await UsuarioModel.buscarDadosUsuario(usuarioOrigem);
+                const novoSaldoOrigem = parseFloat(dadosOrigem.saldo || 0) - quantidadeNum;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioOrigem, novoSaldoOrigem);
+            }
+            if (usuarioDestino.tipo !== 'empresa') {
+                const dadosDestino = await UsuarioModel.buscarDadosUsuario(usuarioDestino);
+                const novoSaldoDestino = parseFloat(dadosDestino.saldo || 0) + quantidadeNum;
+                await UsuarioModel.atualizarSaldoUsuario(usuarioDestino, novoSaldoDestino);
+            }
+    
             await TransacaoModel.atualizar(id, { quantidade, mensagem, origemId, destinoId, tipoTransacao });
             const transacaoAtualizada = await TransacaoModel.buscarPorId(id);
             return res.status(200).json({ mensagem: 'Transação atualizada com sucesso', transacao: transacaoAtualizada });

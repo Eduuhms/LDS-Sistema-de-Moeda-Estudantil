@@ -259,7 +259,7 @@ class VantagemController {
 
             // Atualiza o saldo do aluno
             const novoSaldo = aluno.saldo - vantagem.custo_moedas;
-            await AlunoModel.atualizarSaldo(aluno.id, novoSaldo);
+            await AlunoModel.atualizarSaldo(aluno.usuario_id, novoSaldo);
 
             return res.status(200).json({
                 mensagem: 'Vantagem resgatada com sucesso',
