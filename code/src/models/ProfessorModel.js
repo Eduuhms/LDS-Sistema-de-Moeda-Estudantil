@@ -1,7 +1,6 @@
 const db = require('../config/database');
-const UsuarioModel = require('./UsuarioModel');
 
-class ProfessorModel extends UsuarioModel {
+class ProfessorModel {
   static async criar(professor) {
     const { usuarioId, cpf, departamento, instituicaoEnsinoId } = professor;
     
@@ -71,7 +70,7 @@ class ProfessorModel extends UsuarioModel {
   
   static async atualizarSaldo(id, novoSaldo) {
     await db.query(
-      'UPDATE professores SET saldo = ? WHERE id = ?',
+      'UPDATE professores SET saldo = ? WHERE usuario_id = ?',
       [novoSaldo, id]
     );
   }

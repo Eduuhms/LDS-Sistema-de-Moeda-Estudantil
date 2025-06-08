@@ -292,7 +292,7 @@ static async adicionarMoedasMensais(req, res) {
     for (const professor of professores) {
       try {
         // Adiciona as moedas
-        await ProfessorModel.atualizarSaldo(professor.id, 1000);
+        await ProfessorModel.atualizarSaldo(professor.usuario_id, 1000);
         
         // Cria a transação
         await TransacaoModel.criar({
