@@ -121,7 +121,7 @@ const initDb = async () => {
 
 
       await pool.query(`
-       CREATE TABLE resgates (
+       CREATE TABLE  IF NOT EXISTS resgates (
     id INT AUTO_INCREMENT PRIMARY KEY,
     data_resgate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     aluno_id INT NOT NULL,

@@ -3,10 +3,11 @@ const db = require('../config/database');
 class ResgateModel {
     static async criar(resgate) {
         const { aluno_id, vantagem_id, transacao_id } = resgate;
+        console.log('Criando resgate:', resgate);
 
         const [result] = await db.query(
             'INSERT INTO resgates (aluno_id, vantagem_id, transacao_id) VALUES (?, ?, ?)',
-            [aluno_id, vantagem_id, transacao_id]
+            [aluno_id, vantagem_id, transacao_id.id]
         );
 
         return result.insertId;
