@@ -35,6 +35,33 @@ class EmailService {
             return false;
         }
     }
+
+    async enviarEmailResgateEmpresa(emailEmpresa, codigoResgate, vantagem, nomeAluno) {
+        try {
+            await this.transporter.sendMail({
+                from: process.env.EMAIL_FROM,
+                to: emailEmpresa,
+                subject: 'Nova Vantagem Resgatada - Sistema de Moeda Estudantil',
+                html: `
+                    <h1>Nova Vantagem Resgatada!</h1>
+                    <p>Olá! Um aluno resgatou uma de suas vantagens:</p>
+                    <ul>
+                        <li>Vantagem: <strong>${vantagem.nome}</strong></li>
+                        <li>Aluno: <strong>${nomeAluno}</strong></li>
+                        <li>Código de resgate: <strong>${codigoResgate}</strong></li>
+                    </ul>
+                    <p>Verifique se o código apresentado pelo aluno corresponde ao código acima.</p>
+                    <br>
+                    <p>Atenciosamente,</p>
+                    <p>Equipe do Sistema de Moeda Estudantil</p>
+                `
+            });
+            return true;
+        } catch (error) {
+            console.error('Erro ao enviar e-mail para empresa:', error);
+            return false;
+        }
+    }
 }
 
 module.exports = new EmailService(); 
