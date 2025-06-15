@@ -127,6 +127,7 @@ const initDb = async () => {
     aluno_id INT NOT NULL,
     vantagem_id INT NOT NULL,
     transacao_id INT NOT NULL,
+    codigo VARCHAR(10) NOT NULL,
     FOREIGN KEY (aluno_id) REFERENCES alunos(id),
     FOREIGN KEY (vantagem_id) REFERENCES vantagens(id),
     FOREIGN KEY (transacao_id) REFERENCES transacoes(id)
