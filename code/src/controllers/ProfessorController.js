@@ -26,14 +26,23 @@ class ProfessorController {
     }
   }
 
-  static async listar(req, res) {
-    try {
-      const professores = await ProfessorModel.listar();
-      return res.status(200).json(professores);
-    } catch (error) {
-      return res.status(500).json({ erro: 'Falha ao listar professores.' });
-    }
+ static async listar(req, res) {
+  try {
+    const professores = await ProfessorModel.listar();
+
+    const resultadoFiltrado = professores.map(prof => ({
+      id: prof.id,
+      nome: prof.nome,
+      departamento: prof.departamento,
+      instituicao: prof.instituicao_nome || prof.instituicao // adaptar conforme seu join
+    }));
+
+    return res.status(200).json(resultadoFiltrado);
+  } catch (error) {
+    return res.status(500).json({ erro: 'Falha ao listar professores.' });
   }
+}
+
 
   static validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]/g, '');
