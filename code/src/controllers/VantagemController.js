@@ -1,4 +1,5 @@
 const VantagemModel = require('../models/VantagemModel');
+const SaldoService = require('../services/saldoService');
 
 class VantagemController {
     static async cadastrar(req, res) {
@@ -259,7 +260,7 @@ class VantagemController {
 
             // Atualiza o saldo do aluno
             const novoSaldo = aluno.saldo - vantagem.custo_moedas;
-            await AlunoModel.atualizarSaldo(aluno.usuario_id, novoSaldo);
+         await SaldoService.atualizarSaldo(alunoId, -vantagem.custo_moedas);
 
             return res.status(200).json({
                 mensagem: 'Vantagem resgatada com sucesso',

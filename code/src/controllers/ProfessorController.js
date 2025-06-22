@@ -2,6 +2,7 @@ const UsuarioModel = require('../models/UsuarioModel');
 const ProfessorModel = require('../models/ProfessorModel');
 const InstituicaoEnsinoModel = require('../models/InstituicaoEnsinoModel');
 const db = require('../config/database');
+const SaldoService = require('../services/saldoService');
 
 class ProfessorController {
   static async exibirFormulario(req, res) {
@@ -292,7 +293,7 @@ static async adicionarMoedasMensais(req, res) {
     for (const professor of professores) {
       try {
         // Adiciona as moedas
-        await ProfessorModel.atualizarSaldo(professor.usuario_id, 1000);
+        await SaldoService.atualizarSaldo(professor.usuario_id, 1000);
         
         // Cria a transação
         await TransacaoModel.criar({
