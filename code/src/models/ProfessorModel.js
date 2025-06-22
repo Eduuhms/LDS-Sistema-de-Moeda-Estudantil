@@ -68,12 +68,12 @@ class ProfessorModel {
     );
   }
   
-  static async atualizarSaldo(id, novoSaldo) {
-    await db.query(
-      'UPDATE professores SET saldo = ? WHERE usuario_id = ?',
-      [novoSaldo, id]
-    );
-  }
+static async atualizarSaldo(id, diferenca) {
+  await db.query(
+    'UPDATE professores SET saldo = saldo + ? WHERE usuario_id = ?',
+    [diferenca, id]
+  );
+}
 
 static async listarIds() {
   const [professores] = await db.query(

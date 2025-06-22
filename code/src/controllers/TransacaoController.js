@@ -1,5 +1,6 @@
 const TransacaoModel = require('../models/TransacaoModel');
 const UsuarioModel = require('../models/UsuarioModel');
+const SaldoService = require('../services/saldoService');
 
 class TransacaoController {
     static async listar(req, res) {
@@ -27,58 +28,41 @@ class TransacaoController {
         }
     }
 
-    static async criar(req, res) {
-        try {
-            const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
-            const quantidadeNum = parseFloat(quantidade);
-    
-            if (!quantidade || !origemId || !destinoId || !tipoTransacao || isNaN(quantidadeNum)) {
-                return res.status(400).json({ erro: 'Campos obrigatórios: quantidade (numérica), origemId, destinoId, tipoTransacao' });
-            }
-    
-            const transacao = await TransacaoModel.criar({
-                quantidade: quantidadeNum,
-                mensagem,
-                origemId,
-                destinoId,
-                tipoTransacao
-            });
-            console.log("transacao")
-            console.log(transacao)
-    
-            // const transacao = await TransacaoModel.buscarPorId(id);
-    
-            // Atualiza saldo do usuário de origem
-            const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
-            console.log("usuarioOrigem")
-            console.log(usuarioOrigem)
-            if (usuarioOrigem.tipo !== 'empresa') {
-                const dadosOrigem = await UsuarioModel.buscarDadosUsuario(usuarioOrigem);
-                console.log("dadosOrigem")
-                console.log(dadosOrigem)
-                const novoSaldoOrigem = parseFloat(dadosOrigem.saldo || 0) - quantidadeNum;
-                await UsuarioModel.atualizarSaldoUsuario(usuarioOrigem, novoSaldoOrigem);
-            }
-    
-            
-            // Atualiza saldo do usuário de destino
-            const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
-            console.log("usuarioDestino")
-            console.log(usuarioDestino)
-            if (usuarioDestino.tipo !== 'empresa') {
-                const dadosDestino = await UsuarioModel.buscarDadosUsuario(usuarioDestino);
-                console.log("dadosDestino")
-                console.log(dadosDestino)
-                const novoSaldoDestino = parseFloat(dadosDestino.saldo || 0) + quantidadeNum;
-                await UsuarioModel.atualizarSaldoUsuario(usuarioDestino, novoSaldoDestino);
-            }
-    
-            return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
-        } catch (error) {
-            console.error('Erro ao criar transação:', error);
-            return res.status(500).json({ erro: 'Erro ao criar transação.' });
-        }
+static async criar(req, res) {
+  try {
+    const { quantidade, mensagem, origemId, destinoId, tipoTransacao } = req.body;
+    const quantidadeNum = parseFloat(quantidade);
+
+    if (!quantidade || !origemId || !destinoId || !tipoTransacao || isNaN(quantidadeNum)) {
+      return res.status(400).json({ erro: 'Campos obrigatórios: quantidade (numérica), origemId, destinoId, tipoTransacao' });
     }
+
+    const transacao = await TransacaoModel.criar({
+      quantidade: quantidadeNum,
+      mensagem,
+      origemId,
+      destinoId,
+      tipoTransacao
+    });
+    
+
+    const usuarioOrigem = await UsuarioModel.buscarPorId(origemId);
+    if (usuarioOrigem && usuarioOrigem.tipo !== 'empresa') {
+      await SaldoService.atualizarSaldo(origemId, -quantidadeNum);
+    }
+
+
+    const usuarioDestino = await UsuarioModel.buscarPorId(destinoId);
+    if (usuarioDestino && usuarioDestino.tipo !== 'empresa') {
+      await SaldoService.atualizarSaldo(destinoId, quantidadeNum);
+    }
+
+    return res.status(201).json({ mensagem: 'Transação criada com sucesso', transacao });
+  } catch (error) {
+    console.error('Erro ao criar transação:', error);
+    return res.status(500).json({ erro: 'Erro ao criar transação.' });
+  }
+}
 
     static async atualizar(req, res) {
         try {

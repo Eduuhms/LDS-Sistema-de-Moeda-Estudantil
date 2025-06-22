@@ -76,12 +76,12 @@ class AlunoModel {
     );
   }
   
-  static async atualizarSaldo(id, novoSaldo) {
-    await db.query(
-      'UPDATE alunos SET saldo = ? WHERE usuario_id = ?',
-      [novoSaldo, id]
-    );
-  }
+static async atualizarSaldo(id, diferenca) {
+  await db.query(
+    'UPDATE alunos SET saldo = saldo + ? WHERE usuario_id = ?',
+    [diferenca, id]
+  );
+}
   
 }
 
