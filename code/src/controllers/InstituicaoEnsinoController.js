@@ -13,16 +13,24 @@ class InstituicaoEnsinoController {
     }
   }
 
-  static async listar(req, res) {
-    try {
-      const instituicoes = await InstituicaoEnsinoModel.listar();
-      return res.status(200).json(instituicoes);
-    } catch (error) {
-      return res.status(500).json({ 
-        erro: 'Falha ao listar instituições de ensino. Por favor, tente novamente mais tarde.' 
-      });
-    }
+ static async listar(req, res) {
+  try {
+    const instituicoes = await InstituicaoEnsinoModel.listar();
+
+    const resultadoFiltrado = instituicoes.map(i => ({
+      id: i.id,
+      nome: i.nome,
+      endereco: i.endereco
+    }));
+
+    return res.status(200).json(resultadoFiltrado);
+  } catch (error) {
+    return res.status(500).json({ 
+      erro: 'Falha ao listar instituições de ensino. Por favor, tente novamente mais tarde.' 
+    });
   }
+}
+
 
   static async cadastrar(req, res) {
     try {

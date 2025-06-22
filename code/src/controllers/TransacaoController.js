@@ -2,14 +2,24 @@ const TransacaoModel = require('../models/TransacaoModel');
 const UsuarioModel = require('../models/UsuarioModel');
 
 class TransacaoController {
-    static async listar(req, res) {
-        try {
-            const transacoes = await TransacaoModel.listar();
-            return res.status(200).json(transacoes);
-        } catch (error) {
-            return res.status(500).json({ erro: 'Falha ao listar transações.' });
-        }
+static async listar(req, res) {
+    try {
+        const transacoes = await TransacaoModel.listar();
+
+        const resultadoFiltrado = transacoes.map(transacao => ({
+            id: transacao.id,
+            data: transacao.data,
+            origem: transacao.origem_nome || transacao.origem_id,
+            destino: transacao.destino_nome || transacao.destino_id,
+            quantidade: transacao.quantidade,
+            tipoTransacao: transacao.tipoTransacao
+        }));
+
+        return res.status(200).json(resultadoFiltrado);
+    } catch (error) {
+        return res.status(500).json({ erro: 'Falha ao listar transações.' });
     }
+}
 
     static async buscarPorId(req, res) {
         try {

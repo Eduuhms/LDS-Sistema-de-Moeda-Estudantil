@@ -8,14 +8,24 @@ class AlunoController {
     res.render('alunos/cadastro');
   }
 
-  static async listar(req, res) {
-    try {
-      const alunos = await AlunoModel.listar();
-      return res.status(200).json(alunos);
-    } catch (error) {
-      return res.status(500).json({ erro: 'Falha ao listar alunos. Por favor, tente novamente mais tarde.' });
-    }
+ static async listar(req, res) {
+  try {
+    const alunos = await AlunoModel.listar();
+
+    const alunosFiltrados = alunos.map(aluno => ({
+      id: aluno.id,
+      nome: aluno.nome,
+      email: aluno.email,
+      curso: aluno.curso,
+      instituicaoEnsinoId: aluno.instituicao_ensino_id
+    }));
+
+    return res.status(200).json(alunosFiltrados);
+  } catch (error) {
+    return res.status(500).json({ erro: 'Falha ao listar alunos. Por favor, tente novamente mais tarde.' });
   }
+}
+
 
   static validarCPF(cpf) {
     cpf = cpf.replace(/[^\d]/g, '');

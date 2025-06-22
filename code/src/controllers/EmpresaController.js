@@ -7,17 +7,28 @@ class EmpresaController {
   }
 
   // Lista todas as empresas (para API)
-  static async listar(req, res) {
-    try {
-      const empresas = await EmpresaModel.listar();
-      return res.status(200).json(empresas);
-    } catch (error) {
-      console.error('Erro ao listar empresas:', error);
-      return res.status(500).json({ 
-        erro: 'Falha ao listar empresas. Por favor, tente novamente mais tarde.' 
-      });
-    }
+ static async listar(req, res) {
+  try {
+    const empresas = await EmpresaModel.listar();
+
+    const empresasFiltradas = empresas.map(empresa => ({
+      id: empresa.id,
+      nome: empresa.nome,
+      email: empresa.email,
+      endereco: empresa.endereco,
+      telefone: empresa.telefone,
+      descricao: empresa.descricao
+    }));
+
+    return res.status(200).json(empresasFiltradas);
+  } catch (error) {
+    console.error('Erro ao listar empresas:', error);
+    return res.status(500).json({ 
+      erro: 'Falha ao listar empresas. Por favor, tente novamente mais tarde.' 
+    });
   }
+}
+
 
   // Cadastra uma nova empresa
   static async cadastrar(req, res) {
